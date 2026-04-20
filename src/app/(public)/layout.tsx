@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import ParticlesBackground from '@/components/layout/ParticlesBackground';
 
+
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-brand-beige text-brand-dark font-serif selection:bg-brand-highlight/50 relative">
@@ -15,28 +16,46 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <ParticlesBackground />
       </div>
 
-      {/* Navbar Flotante */}
+{/* Navbar Flotante */}
       <motion.nav 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className="fixed top-0 left-0 right-0 z-50 flex justify-center mt-4 md:mt-6 px-4 pointer-events-none"
       >
-        <div className="bg-white/80 border border-brand-steel/30 backdrop-blur-md px-4 py-3 md:px-8 md:py-3 rounded-2xl md:rounded-full flex flex-col md:flex-row items-center gap-3 md:gap-8 shadow-sm pointer-events-auto w-full md:w-auto max-w-4xl text-center md:text-left">
-          <Link href="/" className="font-sans font-black text-sm sm:text-base lg:text-xl tracking-tighter text-brand-ieee hover:text-brand-salmon transition-colors">
-            Taller de Programación para no Programadores
+        {/* Cambiamos max-w-4xl por max-w-max y ajustamos los breakpoints a lg para que no se aplaste en tablets */}
+        <div className="bg-white/80 border border-brand-steel/30 backdrop-blur-md px-4 py-3 lg:px-6 lg:py-3 rounded-2xl lg:rounded-full flex flex-col lg:flex-row items-center gap-3 lg:gap-6 shadow-sm pointer-events-auto w-full md:w-auto max-w-max text-center lg:text-left">
+          
+          {/* Añadimos lg:whitespace-nowrap para que el título NUNCA se parta en dos líneas en PC */}
+          <Link href="/" className="font-sans font-black text-sm sm:text-base lg:text-lg tracking-tighter text-brand-ieee hover:text-brand-salmon transition-colors lg:whitespace-nowrap">
+            Programación Para Futuros Programadores
           </Link>
-          <div className="hidden md:block h-4 w-[1px] bg-brand-steel/40"></div>
-          <div className="flex gap-4 md:gap-6 text-xs md:text-sm font-sans font-bold text-brand-brown">
-            <Link href="/" className="hover:text-brand-ieee transition-colors">Inicio</Link>
-            <Link href="/blog" className="hover:text-brand-ieee transition-colors">Blog</Link>
+          
+          <div className="hidden lg:block h-4 w-[1px] bg-brand-steel/40"></div>
+          
+          {/* Agrupamos los enlaces del centro para mejor distribución */}
+          <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm font-sans font-bold text-brand-brown">
+            <Link 
+              href="/eventos" 
+              className="relative group flex items-center gap-1.5 px-3 py-2 rounded-full overflow-hidden font-bold shrink-0"
+            >
+              <span className="absolute inset-0 bg-brand-salmon/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 rounded-full"></span>
+              <span className="relative z-10 flex items-center gap-1 text-brand-salmon group-hover:text-brand-dark transition-colors">
+                <span className="animate-pulse"></span> Eventos
+              </span>
+            </Link>
+            <Link href="/" className="hover:text-brand-ieee transition-colors px-2">Inicio</Link>
+            <Link href="/blog" className="hover:text-brand-ieee transition-colors px-2">Blog</Link>
           </div>
-          <div className="hidden md:block h-4 w-[1px] bg-brand-steel/40"></div>
-          <div className="flex gap-3 md:gap-4 text-xs md:text-sm font-sans font-bold items-center mt-1 md:mt-0">
-            <Link href="/login" className="text-brand-dark hover:text-brand-ieee transition-colors">
+
+          <div className="hidden lg:block h-4 w-[1px] bg-brand-steel/40"></div>
+          
+          {/* Botones de acción con whitespace-nowrap para que no se deformen */}
+          <div className="flex gap-3 md:gap-4 text-xs md:text-sm font-sans font-bold items-center mt-1 lg:mt-0 shrink-0">
+            <Link href="/login" className="text-brand-dark hover:text-brand-ieee transition-colors whitespace-nowrap">
               Login
             </Link>
-            <Link href="/register" className="bg-brand-ieee text-white px-4 py-1.5 md:px-5 md:py-2 rounded-full hover:bg-brand-ieee/90 transition-all shadow-sm hover:shadow-md">
+            <Link href="/register" className="bg-brand-ieee text-white px-4 py-1.5 md:px-5 md:py-2 rounded-full hover:bg-brand-ieee/90 transition-all shadow-sm hover:shadow-md whitespace-nowrap">
               Registrarse
             </Link>
           </div>
