@@ -3,25 +3,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-
-// autenticación solo para instructores
-async function checkIsInstructor() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("No autenticado");
-
-  const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
-  if (profile?.role !== 'instructor') {
-    throw new Error("Acceso denegado. Solo instructores.");
-  }
-  return user.id;
-}
+import { requireRole } from '@/lib/auth';
 
 // --- ACCIONES DE INSTRUCTOR ---
 
 // 1. crear un nuevo evento
 export async function createEvent(formData: FormData) {
-  const instructorId = await checkIsInstructor();
+  const instructorId = await requireRole('instructor');
   const supabase = await createClient();
 
   const title = formData.get('title') as string;
@@ -52,7 +40,7 @@ export async function createEvent(formData: FormData) {
 
 // 3. Borrar un evento
 export async function deleteEvent(eventId: string) {
-  await checkIsInstructor();
+  await requireRole('instructor');
   const supabase = await createClient();
   
   const { error } = await supabase.from('events').delete().eq('id', eventId);
@@ -106,7 +94,7 @@ export async function toggleEventRegistration(eventId: string, isRegistered: boo
 // 6. Obtener detalles de un evento y sus asistentes (Solo para Instructores)
 export async function getEventByIdForInstructor(eventId: string) {
   // 1. Verificamos que sea instructor
-  await checkIsInstructor(); 
+  await requireRole('instructor');
   
   const supabase = await createClient();
 
@@ -133,7 +121,7 @@ export async function getEventByIdForInstructor(eventId: string) {
 
 // 7. Actualizar un evento existente
 export async function updateEvent(formData: FormData) {
-  const instructorId = await checkIsInstructor();
+  const instructorId = await requireRole('instructor');
   const supabase = await createClient();
 
   const id = formData.get('id') as string;
@@ -164,7 +152,7 @@ export async function updateEvent(formData: FormData) {
 
 // 8. Borrar evento y salir de la página
 export async function deleteEventAndRedirect(eventId: string) {
-  await checkIsInstructor();
+  await requireRole('instructor');
   const supabase = await createClient();
   
   const { error } = await supabase.from('events').delete().eq('id', eventId);

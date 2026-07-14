@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# volcado local de `tree`, no es parte del proyecto
+structure.md

@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { requireRole } from '@/lib/auth';
 
 export async function getCommunities() {
   const supabase = await createClient();
@@ -124,33 +125,11 @@ export async function createComment(formData: FormData) {
 }
 
 
-async function checkIsInstructor() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) throw new Error("No autenticado");
-
-  const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'instructor') {
-    throw new Error("Acceso denegado. Se requieren permisos de instructor.");
-  }
-  
-  return true;
-}
-
-// 2. Cerrar/Abrir un hilo 
+// 2. Cerrar/Abrir un hilo
 export async function toggleLockPost(postId: string, currentStatus: boolean) {
-  await checkIsInstructor();
+  await requireRole('instructor');
   const supabase = await createClient();
   const { error } = await supabase.from('posts').update({ is_locked: !currentStatus }).eq('id', postId);
-
-  
-  await supabase.from('posts').update({ is_locked: !currentStatus }).eq('id', postId);
 
   if (error) console.error("Error al cerrar post:", error);
   revalidatePath(`/dashboard/student/comunidad/p/${postId}`);
@@ -158,7 +137,7 @@ export async function toggleLockPost(postId: string, currentStatus: boolean) {
 
 // 3. Fijar/Desfijar un post 
 export async function togglePinPost(postId: string, currentStatus: boolean, slug: string) {
-  await checkIsInstructor();
+  await requireRole('instructor');
   const supabase = await createClient();
   
   await supabase.from('posts').update({ is_pinned: !currentStatus }).eq('id', postId);
@@ -168,7 +147,7 @@ export async function togglePinPost(postId: string, currentStatus: boolean, slug
 
 // 4. Avalar una respuesta 
 export async function toggleEndorseComment(commentId: string, postId: string, currentStatus: boolean) {
-  await checkIsInstructor();
+  await requireRole('instructor');
   const supabase = await createClient();
   
   await supabase.from('comments').update({ is_endorsed: !currentStatus }).eq('id', commentId);
@@ -177,7 +156,7 @@ export async function toggleEndorseComment(commentId: string, postId: string, cu
 
 // 5. Borrar un post por completo 
 export async function deletePostAsAdmin(postId: string) {
-  await checkIsInstructor();
+  await requireRole('instructor');
   const supabase = await createClient();
   
   await supabase.from('posts').delete().eq('id', postId);
@@ -187,7 +166,7 @@ export async function deletePostAsAdmin(postId: string) {
 
 // Borrar un comentario específico
 export async function deleteCommentAsAdmin(commentId: string, postId: string) {
-  await checkIsInstructor();
+  await requireRole('instructor');
   const supabase = await createClient();
   
   const { error } = await supabase.from('comments').delete().eq('id', commentId);

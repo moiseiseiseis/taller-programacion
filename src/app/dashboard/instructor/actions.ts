@@ -2,16 +2,11 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth';
 
 export async function createWorkshop(formData: FormData) {
+  const instructorId = await requireRole('instructor');
   const supabase = await createClient();
-  
-  // Verificamos quién es el instructor logueado
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error('Debes iniciar sesión');
-  }
 
   // Extraemos los datos del formulario
   const title = formData.get('title') as string;
@@ -21,10 +16,10 @@ export async function createWorkshop(formData: FormData) {
   // created_by referencia a users (id)
   const { error } = await supabase
     .from('workshops')
-    .insert({ 
-      title: title, 
+    .insert({
+      title: title,
       description: description,
-      created_by: user.id,
+      created_by: instructorId,
       is_active: true // Por defecto se crea activo
     });
 
@@ -38,8 +33,9 @@ export async function createWorkshop(formData: FormData) {
 }
 
 export async function createModule(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
-  
+
   const workshop_id = formData.get('workshop_id') as string;
   const title = formData.get('title') as string;
 
@@ -75,8 +71,9 @@ export async function createModule(formData: FormData) {
 }
 
 export async function createLesson(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
-  
+
   const module_id = formData.get('module_id') as string;
   const title = formData.get('title') as string; 
   const type = formData.get('type') as string;  
@@ -114,8 +111,9 @@ export async function createLesson(formData: FormData) {
 
 
 export async function savePractice(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
-  
+
   const lesson_id = formData.get('lesson_id') as string;
   const title = formData.get('title') as string;
   const instructions = formData.get('instructions') as string;
@@ -159,6 +157,7 @@ export async function savePractice(formData: FormData) {
 
 
 export async function updateLessonMetadata(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
   const lesson_id = formData.get('lesson_id') as string;
   const title = formData.get('title') as string;
@@ -177,6 +176,7 @@ export async function updateLessonMetadata(formData: FormData) {
 }
 
 export async function deleteLesson(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
   const lesson_id = formData.get('lesson_id') as string;
   const module_id = formData.get('module_id') as string;
@@ -202,6 +202,7 @@ export async function deleteLesson(formData: FormData) {
 
 // Alternar si un taller está visible para los alumnos o no
 export async function toggleWorkshopStatus(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
   const workshop_id = formData.get('workshop_id') as string;
   const current_status = formData.get('current_status') === 'true';
@@ -217,10 +218,11 @@ export async function toggleWorkshopStatus(formData: FormData) {
 
 // Eliminar un taller por completo
 export async function deleteWorkshop(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
   const workshop_id = formData.get('workshop_id') as string;
 
-  // Si la base de datos no tiene "ON DELETE CASCADE", 
+  // Si la base de datos no tiene "ON DELETE CASCADE",
   // Postgres bloqueará esto si el taller ya tiene módulos o lecciones dentro.
   const { error } = await supabase
     .from('workshops')
@@ -228,10 +230,11 @@ export async function deleteWorkshop(formData: FormData) {
     .eq('id', workshop_id);
 
   if (error) throw new Error(`Error al eliminar taller: ${error.message}`);
-  redirect('/dashboard/instructor/gestion-talleres');
+  redirect('/dashboard/instructor/workshops');
 }
 
 export async function evaluateSubmission(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
   const submission_id = formData.get('submission_id') as string;
   const status = formData.get('status') as string;
@@ -252,10 +255,8 @@ export async function evaluateSubmission(formData: FormData) {
 
 
 export async function saveTheoryContent(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Usuario no autenticado');
 
   const lesson_id = formData.get('lesson_id') as string;
   const content_markdown = formData.get('content_markdown') as string;
@@ -297,10 +298,8 @@ export async function saveTheoryContent(formData: FormData) {
 }
 
 export async function uploadLessonResource(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Usuario no autenticado');
 
   const lesson_id = formData.get('lesson_id') as string;
   const title = formData.get('title') as string;
@@ -341,9 +340,8 @@ export async function uploadLessonResource(formData: FormData) {
 
 
 export async function updateLessonTools(lessonId: string, toolIds: string[]) {
+  await requireRole('instructor');
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Usuario no autenticado');
 
   // Borramos las herramientas que la lección tenía asignadas previamente
   await supabase.from('lesson_tools').delete().eq('lesson_id', lessonId);

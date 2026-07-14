@@ -1,20 +1,3 @@
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
 # Comunidad y LMS - TDPPNP
 
 Plataforma educativa interactiva construida para gestionar módulos, foros de comunidad y eventos en vivo, con separación de roles (Estudiantes e Instructores).
@@ -29,5 +12,25 @@ Plataforma educativa interactiva construida para gestionar módulos, foros de co
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/tu-usuario/tu-repo.git](https://github.com/tu-usuario/tu-repo.git)
-   cd tu-repo
+   git clone <url-del-repositorio>
+   cd taller-programacion
+   ```
+
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+3. **Configurar variables de entorno:**
+
+   Copiá `.env.example`, renombralo a `.env.local` y completá tus credenciales de Supabase (`Project Settings → API` en el dashboard):
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. **Levantar el servidor de desarrollo:**
+   ```bash
+   npm run dev
+   ```
+
+   Abrí [http://localhost:3000](http://localhost:3000) para ver el resultado.

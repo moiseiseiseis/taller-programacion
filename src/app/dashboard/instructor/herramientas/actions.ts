@@ -2,12 +2,11 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { requireRole } from '@/lib/auth';
 
 export async function addTool(formData: FormData) {
+  const instructorId = await requireRole('instructor');
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Usuario no autenticado');
 
   const name = formData.get('name') as string;
   const category = formData.get('category') as string;
@@ -17,7 +16,7 @@ export async function addTool(formData: FormData) {
     name,
     category,
     description_url,
-    created_by: user.id
+    created_by: instructorId
   });
 
   if (error) {
@@ -30,6 +29,7 @@ export async function addTool(formData: FormData) {
 }
 
 export async function deleteTool(formData: FormData) {
+  await requireRole('instructor');
   const supabase = await createClient();
   const id = formData.get('id') as string;
 
