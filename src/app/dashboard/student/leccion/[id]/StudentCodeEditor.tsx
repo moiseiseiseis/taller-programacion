@@ -37,43 +37,43 @@ export default function StudentCodeEditor({ practice, submission }: { practice: 
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
-      
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-brand-terminal-panel rounded-2xl border border-brand-terminal-border overflow-hidden">
+
       {/* Panel Izquierdo: Instrucciones */}
-      <div className="p-6 bg-zinc-50 border-r border-zinc-200">
+      <div className="p-6 bg-black/20 border-r border-brand-terminal-border">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-zinc-900">{practice.title || 'Ejercicio Práctico'}</h2>
-          <span className="text-xs font-bold px-3 py-1 bg-zinc-200 text-zinc-700 rounded-full uppercase tracking-wider">
+          <h2 className="text-lg font-bold text-brand-beige">{practice.title || 'Ejercicio Práctico'}</h2>
+          <span className="text-xs font-bold px-3 py-1 bg-black/30 text-[#9c9c94] rounded-full uppercase tracking-wider">
             {practice.language}
           </span>
         </div>
-        <div className="prose prose-sm text-zinc-700 whitespace-pre-wrap">
+        <div className="prose prose-sm prose-invert text-[#9c9c94] whitespace-pre-wrap">
           {practice.instructions}
         </div>
-        
+
         {/* Estado de la entrega actual */}
-        <div className="mt-8 pt-6 border-t border-zinc-200">
-          <h3 className="text-sm font-bold text-zinc-900 mb-2">Estado de tu entrega:</h3>
+        <div className="mt-8 pt-6 border-t border-brand-terminal-border">
+          <h3 className="text-sm font-bold text-brand-beige mb-2">Estado de tu entrega:</h3>
           {!submission ? (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-zinc-200 text-zinc-600">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-black/30 text-[#9c9c94]">
               Aún no has enviado código
             </span>
           ) : submission.status === 'correct' ? (
             <div className="space-y-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800 border border-green-200">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-brand-mint/10 text-brand-mint border border-brand-mint/30">
                  Aprobado
               </span>
-              <p className="text-xs text-green-700 font-medium">¡Felicidades! Tu código pasó la revisión.</p>
+              <p className="text-xs text-brand-mint font-medium">¡Felicidades! Tu código pasó la revisión.</p>
             </div>
           ) : submission.status === 'incorrect' ? (
             <div className="space-y-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800 border border-red-200">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-brand-salmon/10 text-brand-salmon border border-brand-salmon/30">
                  Requiere corrección
               </span>
-              <p className="text-xs text-red-700 font-medium">El instructor ha rechazado tu código. Revísalo y vuelve a intentarlo.</p>
+              <p className="text-xs text-brand-salmon font-medium">El instructor ha rechazado tu código. Revísalo y vuelve a intentarlo.</p>
             </div>
           ) : (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">
               ⏳ Pendiente de revisión
             </span>
           )}
@@ -82,31 +82,40 @@ export default function StudentCodeEditor({ practice, submission }: { practice: 
 
       {/* Panel Derecho: Editor */}
       <div className="flex flex-col h-full min-h-[500px]">
-        <div className="bg-zinc-900 px-4 py-3 flex justify-between items-center text-zinc-400 text-sm font-mono border-b border-zinc-800">
-          <span>main.{practice.language === 'python' ? 'py' : practice.language === 'javascript' ? 'js' : 'cpp'}</span>
+        <div className="bg-black/30 px-4 py-3 flex justify-between items-center text-[#6f6f68] text-sm font-mono border-b border-brand-terminal-border">
+          <span>
+            main.
+            {practice.language === 'python'
+              ? 'py'
+              : practice.language === 'javascript'
+              ? 'js'
+              : practice.language === 'cpp'
+              ? 'cpp'
+              : 'txt'}
+          </span>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="flex flex-col flex-1">
           <textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="flex-1 w-full bg-zinc-950 text-emerald-400 font-mono p-6 outline-none resize-none"
+            className="flex-1 w-full bg-black text-brand-mint font-mono p-6 outline-none resize-none"
             spellCheck="false"
           />
-          
-          <div className="bg-white p-4 border-t border-zinc-200 flex justify-between items-center">
+
+          <div className="bg-black/20 p-4 border-t border-brand-terminal-border flex justify-between items-center">
             {isSuccess ? (
-              <span className="text-green-600 font-bold text-sm animate-pulse">
+              <span className="text-brand-mint font-bold text-sm animate-pulse">
                 ¡Código enviado correctamente!
               </span>
             ) : (
-              <span className="text-zinc-400 text-sm">Asegúrate de probar tu código antes de enviar.</span>
+              <span className="text-[#6f6f68] text-sm">Asegúrate de probar tu código antes de enviar.</span>
             )}
-            
+
             <button
               type="submit"
               disabled={isLoading}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-colors ${isLoading ? 'bg-zinc-400 cursor-not-allowed' : 'bg-black hover:bg-zinc-800'}`}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${isLoading ? 'bg-black/30 text-[#6f6f68] cursor-not-allowed' : 'bg-brand-mint text-[#0f1a15] hover:brightness-110'}`}
             >
               {isLoading ? 'Enviando...' : 'Enviar Solución'}
             </button>

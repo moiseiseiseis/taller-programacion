@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* colores kaguais */
@@ -11,7 +12,21 @@
   --color-brand-brown: #5A453A;
   --color-brand-ieee: #00629B;
 
+  /* terminal cálida */
+  --color-brand-terminal: #14100D;
+  --color-brand-terminal-panel: #1A1613;
+  --color-brand-terminal-border: #322C25;
+
   /*tipografías kaguais*/
   --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-montserrat), sans-serif;
+  --font-mono: var(--font-jetbrains), 'Courier New', monospace;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }

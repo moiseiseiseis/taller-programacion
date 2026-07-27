@@ -2,6 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import { scoreLessonQuiz, getLessonQuizMaxScore, type LessonQuiz, type LessonQuizAnswer } from '@/lib/lessonQuiz';
 
 export async function enrollInWorkshop(formData: FormData) {
   const supabase = await createClient();
@@ -15,7 +17,7 @@ export async function enrollInWorkshop(formData: FormData) {
   // la base de datos tiene una restricción UNIQUE (workshop_id, user_id),
   // por lo que si el alumno intenta hacer trampa, Postgres lo detendrá automáticamente.
   const { error } = await supabase
-    .from('workshop_enrollments')
+    .from('enrollments')
     .insert({
       workshop_id: workshop_id,
       user_id: user.id
@@ -77,5 +79,208 @@ export async function submitCode(formData: FormData) {
     throw new Error(`Error al guardar entrega: ${error.message}`);
   }
 
+  return { success: true };
+}
+
+export async function submitLessonQuiz(lessonId: string, answers: LessonQuizAnswer[]) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Debes iniciar sesión');
+
+  // El quiz se lee de la base, nunca del cliente: así el puntaje no se puede falsear.
+  const { data: lesson } = await supabase.from('lessons').select('quiz').eq('id', lessonId).single();
+  const quiz = lesson?.quiz as LessonQuiz | null;
+
+  if (!quiz) throw new Error('Esta lección no tiene un quiz configurado');
+
+  const { score, passed, results } = scoreLessonQuiz(quiz, answers);
+
+  const { error } = await supabase.from('lesson_quiz_attempts').insert({
+    lesson_id: lessonId,
+    user_id: user.id,
+    score,
+    passed,
+    answers,
+  });
+
+  if (error) {
+    console.error('Error al guardar intento de quiz:', error);
+    throw new Error('No se pudo guardar tu intento');
+  }
+
+  if (passed) {
+    await supabase
+      .from('lesson_completions')
+      .upsert(
+        { lesson_id: lessonId, user_id: user.id },
+        { onConflict: 'lesson_id,user_id', ignoreDuplicates: true }
+      );
+  }
+
+  revalidatePath(`/dashboard/student/leccion/${lessonId}`);
+  return { score, passed, results, maxScore: getLessonQuizMaxScore(quiz) };
+}
+
+// Marca como completada una lección de teoría que no tiene quiz. No afecta el
+// bloqueo de avance (eso lo maneja lesson_quiz_attempts) — esto solo alimenta
+// el progreso visible: checkmarks, barras de %, "Mi Progreso".
+export async function markLessonComplete(lessonId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Debes iniciar sesión');
+
+  const { error } = await supabase
+    .from('lesson_completions')
+    .upsert(
+      { lesson_id: lessonId, user_id: user.id },
+      { onConflict: 'lesson_id,user_id', ignoreDuplicates: true }
+    );
+
+  if (error) {
+    console.error('Error al marcar la lección como completada:', error);
+    throw new Error('No se pudo guardar tu progreso');
+  }
+
+  revalidatePath(`/dashboard/student/leccion/${lessonId}`);
+  return { success: true };
+}
+
+// Marca un ejercicio de Python como resuelto. A diferencia de
+// completeTerminalLevel, esto NO marca la lección como completa aunque se
+// resuelvan todos los ejercicios: a una lección de tipo 'python' todavía le
+// falta aprobar el quiz mixto de cierre, y eso lo maneja submitLessonQuiz.
+export async function completePythonExercise(exerciseId: string, lessonId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Debes iniciar sesión');
+
+  const { error } = await supabase
+    .from('python_exercise_progress')
+    .upsert(
+      { exercise_id: exerciseId, user_id: user.id },
+      { onConflict: 'exercise_id,user_id', ignoreDuplicates: true }
+    );
+
+  if (error) {
+    console.error('Error al guardar progreso del ejercicio:', error);
+    throw new Error('No se pudo guardar tu progreso');
+  }
+
+  revalidatePath(`/dashboard/student/leccion/${lessonId}`);
+  return { success: true };
+}
+
+// Marca una pieza del expediente (acertijo de lógica) como resuelta. Igual
+// que completePythonExercise, esto NO marca la lección como completa: a una
+// lección de tipo 'logic' todavía le falta aprobar el quiz de cierre.
+export async function completeLogicPuzzle(puzzleId: string, lessonId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Debes iniciar sesión');
+
+  const { error } = await supabase
+    .from('logic_puzzle_progress')
+    .upsert(
+      { puzzle_id: puzzleId, user_id: user.id },
+      { onConflict: 'puzzle_id,user_id', ignoreDuplicates: true }
+    );
+
+  if (error) {
+    console.error('Error al guardar progreso de la pieza:', error);
+    throw new Error('No se pudo guardar tu progreso');
+  }
+
+  revalidatePath(`/dashboard/student/leccion/${lessonId}`);
+  return { success: true };
+}
+
+// Marca un nivel del minijuego de terminal como resuelto. Si con este ya
+// quedaron todos los niveles de la lección resueltos, marca la lección
+// completa también, para que se integre al progreso general.
+export async function completeTerminalLevel(levelId: string, lessonId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Debes iniciar sesión');
+
+  const { error } = await supabase
+    .from('terminal_level_progress')
+    .upsert(
+      { level_id: levelId, user_id: user.id },
+      { onConflict: 'level_id,user_id', ignoreDuplicates: true }
+    );
+
+  if (error) {
+    console.error('Error al guardar progreso del nivel:', error);
+    throw new Error('No se pudo guardar tu progreso');
+  }
+
+  const [{ data: allLevels }, { data: solvedLevels }] = await Promise.all([
+    supabase.from('terminal_levels').select('id').eq('lesson_id', lessonId),
+    supabase
+      .from('terminal_level_progress')
+      .select('level_id, terminal_levels!inner(lesson_id)')
+      .eq('user_id', user.id)
+      .eq('terminal_levels.lesson_id', lessonId),
+  ]);
+
+  if (allLevels && solvedLevels && allLevels.length > 0 && solvedLevels.length >= allLevels.length) {
+    await supabase
+      .from('lesson_completions')
+      .upsert(
+        { lesson_id: lessonId, user_id: user.id },
+        { onConflict: 'lesson_id,user_id', ignoreDuplicates: true }
+      );
+  }
+
+  revalidatePath(`/dashboard/student/leccion/${lessonId}`);
+  return { success: true };
+}
+
+// Guarda (o actualiza) la respuesta reflexiva de un ejercicio de
+// Metacognición. A diferencia de los demás motores, esto no corrige nada
+// automáticamente: el avance se marca al guardar, no al acertar, porque
+// estos ejercicios no tienen un estado "correcto" que aprobar.
+export async function saveReflectionResponse(
+  exerciseId: string,
+  lessonId: string,
+  response: unknown,
+  referencedLessonId: string | null
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Debes iniciar sesión');
+
+  const { error } = await supabase
+    .from('metacog_submissions')
+    .upsert(
+      {
+        exercise_id: exerciseId,
+        user_id: user.id,
+        response,
+        referenced_lesson_id: referencedLessonId,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'exercise_id,user_id' }
+    );
+
+  if (error) {
+    console.error('Error al guardar la respuesta reflexiva:', error);
+    throw new Error('No se pudo guardar tu respuesta');
+  }
+
+  await supabase
+    .from('lesson_completions')
+    .upsert(
+      { lesson_id: lessonId, user_id: user.id },
+      { onConflict: 'lesson_id,user_id', ignoreDuplicates: true }
+    );
+
+  revalidatePath(`/dashboard/student/leccion/${lessonId}`);
   return { success: true };
 }

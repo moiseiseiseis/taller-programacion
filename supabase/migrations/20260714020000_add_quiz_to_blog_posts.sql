@@ -1,0 +1,11 @@
+-- Quiz interactivo opcional por post (preguntas con puntaje + rangos de resultado).
+-- Null = el post no tiene quiz. Estructura esperada:
+-- {
+--   "questions": [
+--     { "text": "...", "options": [{ "label": "...", "score": 0 }, ...] }
+--   ],
+--   "results": [
+--     { "max": 4, "title": "...", "text": "..." }
+--   ]
+-- }
+alter table public.blog_posts add column if not exists quiz jsonb;

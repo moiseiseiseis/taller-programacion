@@ -2,7 +2,15 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+
+async function getSiteOrigin() {
+  const h = await headers()
+  const host = h.get('x-forwarded-host') ?? h.get('host')
+  const proto = h.get('x-forwarded-proto') ?? (process.env.NODE_ENV === 'development' ? 'http' : 'https')
+  return `${proto}://${host}`
+}
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -65,4 +73,38 @@ export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   redirect('/login')
+}
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = formData.get('email') as string
+  const supabase = await createClient()
+  const origin = await getSiteOrigin()
+
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  })
+
+  // Mensaje genérico siempre, exista o no el email (evita enumeración de usuarios)
+  redirect('/forgot-password?message=Si+el+correo+existe,+te+enviamos+un+enlace')
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  if (password !== confirmPassword) {
+    redirect('/reset-password?error=Las+contraseñas+no+coinciden')
+  }
+  if (password.length < 6) {
+    redirect('/reset-password?error=La+contraseña+debe+tener+al+menos+6+caracteres')
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    redirect('/reset-password?error=No+se+pudo+actualizar+la+contraseña')
+  }
+
+  redirect('/login?message=Contraseña+actualizada')
 }

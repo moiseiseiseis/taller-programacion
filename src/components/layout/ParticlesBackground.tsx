@@ -38,19 +38,19 @@ export default function ParticlesBackground() {
             grab: {
               distance: 200,
               links: {
-                opacity: 0.5,
-                color: '#D5615B', // Las líneas hacia el cursor serán color Salmón
+                opacity: 0.35,
+                color: '#9BCCB1', // Las líneas hacia el cursor serán color Mint
               },
             },
           },
         },
         particles: {
-          color: { value: '#9DB6D3' }, // Color Acero (Steel) para los nodos
+          color: { value: '#9BCCB1' }, // Color Mint para los nodos, dominante sobre el fondo oscuro
           links: {
-            color: '#00629B', // Color Azul IEEE para las conexiones
+            color: '#9BCCB1', // Conexiones también en Mint para mantener consistencia
             distance: 150,
             enable: true,
-            opacity: 0.15, //suave
+            opacity: 0.1, // más sutil para no competir con el texto del hero
             width: 1,
           },
           move: {
@@ -65,7 +65,7 @@ export default function ParticlesBackground() {
             density: { enable: true, width: 800, height: 800 },
             value: 60, // Cantidad de nodos en pantalla
           },
-          opacity: { value: 0.4 },
+          opacity: { value: 0.25 },
           shape: { type: 'circle' },
           size: {
             value: { min: 1, max: 2 }, 

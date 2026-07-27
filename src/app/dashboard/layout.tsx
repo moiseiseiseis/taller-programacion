@@ -34,15 +34,15 @@ export default async function DashboardLayout({
   const role = userData?.role || 'student'
 
   return (
-    <div className="min-h-screen bg-brand-beige flex flex-col font-serif text-brand-dark">
+    <div className="min-h-screen bg-brand-terminal flex flex-col font-serif text-brand-beige">
       <Navbar />
-      
+
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Renderizado condicional del Sidebar según el rol */}
         {role === 'student' && <SidebarStudent />}
         {role === 'instructor' && <SidebarInstructor />}
         {role === 'admin' && <SidebarAdmin />}
-        
+
         {/* Contenedor principal donde vivirán las páginas */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 w-full">
           {children}

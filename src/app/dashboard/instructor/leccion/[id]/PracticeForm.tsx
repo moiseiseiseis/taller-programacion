@@ -41,14 +41,14 @@ export default function PracticeForm({
   // Si fue un éxito, mostramos la "leyenda" en lugar del formulario
   if (isSuccess) {
     return (
-      <div className="p-8 bg-green-50 border border-green-200 rounded-2xl text-center animate-in fade-in duration-500">
-        <div className="text-green-600 mb-4 flex justify-center">
+      <div className="p-8 bg-brand-mint/10 border border-brand-mint/30 rounded-2xl text-center animate-in fade-in duration-500">
+        <div className="text-brand-mint mb-4 flex justify-center">
           <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
-        <h3 className="text-2xl font-bold text-green-900 mb-2">¡Práctica guardada con éxito!</h3>
-        <p className="text-green-700 font-semibold">Redirigiendo de vuelta al módulo...</p>
+        <h3 className="text-2xl font-bold text-brand-beige mb-2">¡Práctica guardada con éxito!</h3>
+        <p className="text-brand-mint font-semibold">Redirigiendo de vuelta al módulo...</p>
       </div>
     );
   }
@@ -60,23 +60,23 @@ export default function PracticeForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <label className="block text-sm font-semibold text-zinc-900 mb-1">Título del Ejercicio</label>
+          <label className="block text-sm font-semibold text-brand-beige mb-1">Título del Ejercicio</label>
           <input
             type="text"
             name="title"
             defaultValue={practice?.title || ''}
             required
-            className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 focus:border-black focus:ring-1 outline-none"
+            className="w-full rounded-lg border border-brand-terminal-border bg-black/30 px-4 py-3 text-brand-beige focus:border-brand-mint focus:ring-1 focus:ring-brand-mint outline-none"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-semibold text-zinc-900 mb-1">Lenguaje de Programación</label>
-          <select 
-            name="language" 
+          <label className="block text-sm font-semibold text-brand-beige mb-1">Lenguaje de Programación</label>
+          <select
+            name="language"
             defaultValue={practice?.language || ''}
             required
-            className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 focus:border-black focus:ring-1 outline-none bg-white"
+            className="w-full rounded-lg border border-brand-terminal-border bg-black/30 px-4 py-3 text-brand-beige focus:border-brand-mint focus:ring-1 focus:ring-brand-mint outline-none"
           >
             <option value="">Selecciona un lenguaje...</option>
             <option value="python">Python</option>
@@ -86,44 +86,44 @@ export default function PracticeForm({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-semibold text-zinc-900 mb-1">Instrucciones detalladas</label>
-          <textarea 
-            name="instructions" 
+          <label className="block text-sm font-semibold text-brand-beige mb-1">Instrucciones detalladas</label>
+          <textarea
+            name="instructions"
             defaultValue={practice?.instructions || ''}
             required
             rows={4}
-            className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 focus:border-black focus:ring-1 outline-none font-sans"
+            className="w-full rounded-lg border border-brand-terminal-border bg-black/30 px-4 py-3 text-brand-beige focus:border-brand-mint focus:ring-1 focus:ring-brand-mint outline-none font-sans"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-zinc-900 mb-1">Código Base (Starter Code)</label>
-          <textarea 
-            name="starter_code" 
+          <label className="block text-sm font-semibold text-brand-beige mb-1">Código Base (Starter Code)</label>
+          <textarea
+            name="starter_code"
             defaultValue={practice?.starter_code || ''}
             required
             rows={8}
-            className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 focus:border-black focus:ring-1 outline-none font-mono text-sm bg-zinc-50"
+            className="w-full rounded-lg border border-brand-terminal-border px-4 py-3 text-brand-mint focus:border-brand-mint focus:ring-1 focus:ring-brand-mint outline-none font-mono text-sm bg-black"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-zinc-900 mb-1">Resultado Esperado (Output)</label>
-          <textarea 
-            name="expected_output" 
+          <label className="block text-sm font-semibold text-brand-beige mb-1">Resultado Esperado (Output)</label>
+          <textarea
+            name="expected_output"
             defaultValue={practice?.expected_output || ''}
             required
             rows={8}
-            className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 focus:border-black focus:ring-1 outline-none font-mono text-sm bg-zinc-50"
+            className="w-full rounded-lg border border-brand-terminal-border px-4 py-3 text-brand-mint focus:border-brand-mint focus:ring-1 focus:ring-brand-mint outline-none font-mono text-sm bg-black"
           />
         </div>
       </div>
 
-      <div className="pt-4 border-t border-zinc-100 flex justify-end">
+      <div className="pt-4 border-t border-brand-terminal-border flex justify-end">
         <button
           type="submit"
           disabled={isLoading}
-          className={`py-3 px-6 rounded-lg font-bold text-white transition-colors shadow-sm ${isLoading ? 'bg-zinc-400 cursor-not-allowed' : 'bg-black hover:bg-zinc-800'}`}
+          className={`py-3 px-6 rounded-lg font-bold transition-all ${isLoading ? 'bg-black/30 text-[#6f6f68] cursor-not-allowed' : 'bg-brand-mint text-[#0f1a15] hover:brightness-110'}`}
         >
           {isLoading ? 'Guardando...' : 'Guardar Ejercicio'}
         </button>

@@ -23,7 +23,7 @@ Plataforma educativa interactiva construida para gestionar módulos, foros de co
 
 3. **Configurar variables de entorno:**
 
-   Copiá `.env.example`, renombralo a `.env.local` y completá tus credenciales de Supabase (`Project Settings → API` en el dashboard):
+   Copia `.env.example`, renómbralo a `.env.local` y completa tus credenciales de Supabase (`Project Settings → API` en el dashboard):
    ```bash
    cp .env.example .env.local
    ```
@@ -33,4 +33,4 @@ Plataforma educativa interactiva construida para gestionar módulos, foros de co
    npm run dev
    ```
 
-   Abrí [http://localhost:3000](http://localhost:3000) para ver el resultado.
+   Abre [http://localhost:3000](http://localhost:3000) para ver el resultado.

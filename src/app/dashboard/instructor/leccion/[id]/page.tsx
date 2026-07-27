@@ -3,8 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import PracticeForm from './PracticeForm'; 
 import LessonSettings from './LessonSettings';
-import TheoryEditor from './TheoryEditor'; 
+import TheoryEditor from './TheoryEditor';
 import ToolSelector from './ToolSelector';
+import LessonQuizEditor from './LessonQuizEditor';
+import PythonExercisesEditor from './PythonExercisesEditor';
+import TerminalLevelsEditor from './TerminalLevelsEditor';
+import LogicPuzzlesEditor from './LogicPuzzlesEditor';
+import ReflectionExerciseEditor from './ReflectionExerciseEditor';
 
 export default async function GestionarLeccionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -39,6 +44,86 @@ export default async function GestionarLeccionPage({ params }: { params: Promise
     theory = theoryData;
   }
 
+  // Traemos los niveles del minijuego de terminal (si aplica)
+  let terminalLevels: {
+    id: string;
+    order_index: number;
+    title: string;
+    narrative: string | null;
+    goal: string;
+    filesystem: unknown;
+    validator: unknown;
+    hint: string | null;
+  }[] = [];
+  if (lesson.type === 'terminal') {
+    const { data } = await supabase
+      .from('terminal_levels')
+      .select('*')
+      .eq('lesson_id', id)
+      .order('order_index', { ascending: true });
+    terminalLevels = data || [];
+  }
+
+  // Traemos los ejercicios de Python (si aplica)
+  let pythonExercises: {
+    id: string;
+    order_index: number;
+    kind: string;
+    title: string;
+    prompt: string;
+    starter_code: string;
+    test_spec: unknown;
+    hint: string | null;
+  }[] = [];
+  if (lesson.type === 'python') {
+    const { data } = await supabase
+      .from('python_exercises')
+      .select('*')
+      .eq('lesson_id', id)
+      .order('order_index', { ascending: true });
+    pythonExercises = data || [];
+  }
+
+  // Traemos las piezas del expediente (si aplica)
+  let logicPuzzles: {
+    id: string;
+    order_index: number;
+    kind: string;
+    title: string;
+    narrative: string | null;
+    prompt: string;
+    puzzle_data: unknown;
+    solution: unknown;
+    hint: string | null;
+    explanation: string | null;
+  }[] = [];
+  if (lesson.type === 'logic') {
+    const { data } = await supabase
+      .from('logic_puzzles')
+      .select('*')
+      .eq('lesson_id', id)
+      .order('order_index', { ascending: true });
+    logicPuzzles = data || [];
+  }
+
+  // Traemos el ejercicio reflexivo (si aplica)
+  let metacogExercise: {
+    id: string;
+    kind: string;
+    title: string;
+    prompt: string;
+    config: unknown;
+    hint: string | null;
+  } | null = null;
+  if (lesson.type === 'reflection') {
+    const { data } = await supabase
+      .from('metacog_exercises')
+      .select('*')
+      .eq('lesson_id', id)
+      .maybeSingle();
+    metacogExercise = data;
+  }
+
   // Traemos el inventario de herramientas del instructor
   const { data: availableTools } = await supabase
     .from('tools')
@@ -59,15 +144,15 @@ export default async function GestionarLeccionPage({ params }: { params: Promise
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Encabezado */}
       <div>
-        <Link 
-          href={`/dashboard/instructor/modulo/${lesson.module_id}`} 
-          className="text-sm font-semibold text-zinc-500 hover:text-black mb-4 inline-block"
+        <Link
+          href={`/dashboard/instructor/modulo/${lesson.module_id}`}
+          className="text-sm font-semibold text-[#9c9c94] hover:text-brand-mint mb-4 inline-block"
         >
           ← Volver al Módulo: {lesson.modules?.title}
         </Link>
         <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold text-zinc-900">{lesson.title}</h1>
-          <span className="bg-black text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+          <h1 className="font-mono text-3xl font-bold text-brand-beige">{lesson.title}</h1>
+          <span className="bg-brand-mint text-[#0f1a15] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
             {lesson.type}
           </span>
         </div>
@@ -77,31 +162,42 @@ export default async function GestionarLeccionPage({ params }: { params: Promise
       <LessonSettings lesson={lesson} />
 
       {/* selector de Herramientas */}
-      <ToolSelector 
-        lessonId={lesson.id} 
-        availableTools={availableTools || []} 
-        initialSelected={initialSelectedTools} 
+      <ToolSelector
+        lessonId={lesson.id}
+        availableTools={availableTools || []}
+        initialSelected={initialSelectedTools}
       />
+
+      {/* Quiz obligatorio para avanzar a la siguiente lección */}
+      <LessonQuizEditor lessonId={lesson.id} quiz={lesson.quiz} />
 
       {/* Renderizado condicional del editor principal según el tipo de lección */}
       {(lesson.type === 'practice' || lesson.type === 'challenge') ? (
-        <div className="bg-white p-8 rounded-2xl border border-zinc-200 shadow-sm">
-          <div className="mb-6 border-b border-zinc-100 pb-4">
-            <h2 className="text-xl font-bold text-zinc-900">Configuración del Ejercicio</h2>
-            <p className="text-zinc-500 text-sm">Define el entorno de código para tus alumnos.</p>
+        <div className="bg-brand-terminal-panel p-8 rounded-2xl border border-brand-terminal-border">
+          <div className="mb-6 border-b border-brand-terminal-border pb-4">
+            <h2 className="text-xl font-bold text-brand-beige">Configuración del Ejercicio</h2>
+            <p className="text-[#9c9c94] text-sm">Define el entorno de código para tus alumnos.</p>
           </div>
 
-          <PracticeForm 
-            lessonId={lesson.id} 
-            moduleId={lesson.module_id} 
-            practice={practice} 
+          <PracticeForm
+            lessonId={lesson.id}
+            moduleId={lesson.module_id}
+            practice={practice}
           />
         </div>
       ) : lesson.type === 'theory' ? (
         <TheoryEditor lesson={lesson} theory={theory} />
+      ) : lesson.type === 'terminal' ? (
+        <TerminalLevelsEditor lessonId={lesson.id} levels={terminalLevels} />
+      ) : lesson.type === 'python' ? (
+        <PythonExercisesEditor lessonId={lesson.id} exercises={pythonExercises} />
+      ) : lesson.type === 'logic' ? (
+        <LogicPuzzlesEditor lessonId={lesson.id} puzzles={logicPuzzles} />
+      ) : lesson.type === 'reflection' ? (
+        <ReflectionExerciseEditor lessonId={lesson.id} exercise={metacogExercise} />
       ) : (
-        <div className="p-12 border border-dashed border-zinc-300 rounded-2xl text-center bg-white">
-          <p className="text-zinc-500 font-semibold text-lg">Tipo de lección no reconocido.</p>
+        <div className="p-12 border border-dashed border-brand-terminal-border rounded-2xl text-center bg-brand-terminal-panel">
+          <p className="text-[#9c9c94] font-semibold text-lg">Tipo de lección no reconocido.</p>
         </div>
       )}
     </div>

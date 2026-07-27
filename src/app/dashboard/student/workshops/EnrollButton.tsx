@@ -29,10 +29,10 @@ export default function EnrollButton({ workshopId, isEnrolled }: { workshopId: s
     <button 
       onClick={handleAction}
       disabled={isLoading}
-      className={`w-full py-2 rounded font-sans font-bold transition-colors ${
-        isEnrolled 
-          ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-zinc-200' 
-          : 'bg-brand-mint text-brand-brown hover:bg-brand-mint/80'
+      className={`w-full py-2 rounded font-mono font-bold transition-colors ${
+        isEnrolled
+          ? 'bg-black/30 text-[#9c9c94] hover:bg-black/40 border border-brand-terminal-border'
+          : 'bg-brand-mint text-[#0f1a15] hover:brightness-110'
       } disabled:opacity-50`}
     >
       {isLoading ? 'Cargando...' : isEnrolled ? 'Continuar Taller →' : 'Inscribirme'}

@@ -7,9 +7,9 @@ const categoryLabels: Record<string, string> = {
 };
 
 const categoryColors: Record<string, string> = {
-  hardware: 'bg-purple-100 text-purple-800 border-purple-200',
-  software: 'bg-blue-100 text-blue-800 border-blue-200',
-  language: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  hardware: 'bg-purple-500/10 text-purple-300 border-purple-500/30',
+  software: 'bg-brand-steel/10 text-brand-steel border-brand-steel/30',
+  language: 'bg-brand-mint/10 text-brand-mint border-brand-mint/30',
 };
 
 export default async function StudentToolsDirectory() {
@@ -32,36 +32,36 @@ export default async function StudentToolsDirectory() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-10">
-      <div className="bg-black text-white p-10 rounded-3xl shadow-lg relative overflow-hidden">
+      <div className="bg-brand-terminal-panel border border-brand-terminal-border text-brand-beige p-10 rounded-3xl relative overflow-hidden">
         <div className="relative z-10">
-          <h1 className="text-4xl font-bold mb-4">Directorio de Hrramientas</h1>
-          <p className="text-zinc-300 max-w-2xl text-lg">
+          <h1 className="font-mono text-4xl font-bold mb-4">Directorio de Hrramientas</h1>
+          <p className="text-[#9c9c94] max-w-2xl text-lg">
             Explora todas las herramientas, lenguajes y hardware que aprenderás a dominar a lo largo de nuestros talleres. Haz clic en cualquiera para ir a su documentación oficial.
           </p>
         </div>
         {/* Decoración abstracta de fondo */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-zinc-800 rounded-full opacity-50 blur-3xl"></div>
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-brand-mint/10 rounded-full opacity-50 blur-3xl"></div>
       </div>
 
       {Object.keys(groupedTools).length === 0 ? (
-        <div className="p-12 text-center border border-dashed border-zinc-300 rounded-2xl">
-          <p className="text-zinc-500 font-semibold text-lg">Aún no hay herramientas registradas.</p>
+        <div className="p-12 text-center border border-dashed border-brand-terminal-border rounded-2xl">
+          <p className="text-[#9c9c94] font-semibold text-lg">Aún no hay herramientas registradas.</p>
         </div>
       ) : (
         <div className="space-y-12">
           {Object.keys(categoryLabels).map((categoryKey) => {
             const categoryTools = groupedTools[categoryKey];
-            
+
             // Si no hay herramientas en esta categoría, no la dibujamos
             if (!categoryTools || categoryTools.length === 0) return null;
 
             return (
               <div key={categoryKey}>
-                <h2 className="text-2xl font-bold text-zinc-900 mb-6 flex items-center gap-3">
+                <h2 className="font-mono text-2xl font-bold text-brand-beige mb-6 flex items-center gap-3">
                   {categoryKey === 'hardware' ? '🔌' : categoryKey === 'software' ? '' : ''}
                   {categoryLabels[categoryKey]}
                 </h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {categoryTools.map((tool: any) => (
                     <a
@@ -69,7 +69,7 @@ export default async function StudentToolsDirectory() {
                       href={tool.description_url || '#'}
                       target={tool.description_url ? "_blank" : "_self"}
                       rel="noopener noreferrer"
-                      className="group bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm hover:shadow-md hover:border-black transition-all flex flex-col justify-between h-full"
+                      className="group bg-brand-terminal-panel p-6 rounded-2xl border border-brand-terminal-border hover:border-brand-mint/50 transition-all flex flex-col justify-between h-full"
                     >
                       <div>
                         <div className="flex justify-between items-start mb-4">
@@ -77,17 +77,17 @@ export default async function StudentToolsDirectory() {
                             {categoryKey.toUpperCase()}
                           </span>
                         </div>
-                        <h3 className="text-xl font-bold text-zinc-900 group-hover:text-brand-primary transition-colors">
+                        <h3 className="text-xl font-bold text-brand-beige group-hover:text-brand-mint transition-colors">
                           {tool.name}
                         </h3>
                       </div>
-                      
+
                       {tool.description_url ? (
-                        <div className="mt-6 text-sm font-semibold text-zinc-500 group-hover:text-black flex items-center gap-1 transition-colors">
+                        <div className="mt-6 text-sm font-semibold text-[#9c9c94] group-hover:text-brand-mint flex items-center gap-1 transition-colors">
                           Leer documentación <span>→</span>
                         </div>
                       ) : (
-                        <div className="mt-6 text-sm text-zinc-400 italic">
+                        <div className="mt-6 text-sm text-[#6f6f68] italic">
                           Documentación pendiente
                         </div>
                       )}

@@ -1,48 +1,50 @@
 'use client';
 
-
 import { motion, Variants } from 'framer-motion';
 import { Calendar, Coffee, Rocket, Code, MapPin, Clock } from 'lucide-react';
+import TerminalWindow from '@/components/layout/TerminalWindow';
 
 const publicEvents = [
   {
     id: 1,
+    file: "ctrl_cafe.log",
     title: "Ctrl+Café",
     date: "Sesiones Por definir",
     time: "Por definir",
     location: "Por Definir",
     description: "Nuestra reunión recurrente para debatir lecturas sobre el impacto de la tecnología, acompañados de buen café y galletas. Un espacio libre de código (o no) para hacer networking y formar comunidad.",
     icon: Coffee,
-    color: "from-brand-salmon/20 to-transparent",
+    accent: "#D5615B",
     iconColor: "text-brand-salmon",
     tag: "Próximamente"
   },
   {
     id: 2,
+    file: "inicio_taller.log",
     title: "Inicio del Taller",
     date: "Agosto 2026",
     time: "Por Definir",
     location: "Por Definir",
     description: "El evento principal. Arrancamos formalmente con el Taller de Programación para no programadores. Prepárate para escribir tus primeras líneas de código.",
     icon: Rocket,
-    color: "from-brand-ieee/20 to-transparent",
-    iconColor: "text-brand-ieee",
+    accent: "#9BCCB1",
+    iconColor: "text-brand-mint",
     tag: "Evento Principal"
   },
   {
     id: 3,
+    file: "hackathon_invierno.log",
     title: "Hackathon Invierno",
     date: "Invierno 2026",
     time: "Por Definir",
     location: "Por Definir",
     description: "Demuestra lo que has aprendido. Forma tu equipo, elige un problema real de tu comunidad y construye una solución tecnológica durante un fin de semana lleno de adrenalina, pizza y código.",
     icon: Code,
-    color: "from-brand-dark/20 to-transparent",
-    iconColor: "text-brand-dark",
+    accent: "#9DB6D3",
+    iconColor: "text-brand-steel",
     tag: "Competencia"
   }
 ];
-
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -60,35 +62,44 @@ const itemVariants: Variants = {
 export default function PublicEventsPage() {
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden relative">
-      
-      {/* Fondo decorativo abstracto */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-brand-salmon/5 blur-[120px]"></div>
-        <div className="absolute top-[40%] -left-[10%] w-[50%] h-[50%] rounded-full bg-brand-ieee/5 blur-[120px]"></div>
-      </div>
 
-      <div className="max-w-5xl mx-auto">
-        
+      {/* textura sutil de scanlines, igual que en la home */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(to bottom, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px)',
+        }}
+      />
+
+      <div className="max-w-5xl mx-auto relative z-10">
+
         {/* Hero de Eventos */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16 md:mb-24 space-y-4"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-brand-salmon/20 shadow-sm text-sm font-bold text-brand-salmon uppercase tracking-widest mb-2">
-            <Calendar size={16} /> Agenda 2026
+          <div className="inline-block font-mono text-[13px] text-brand-steel">
+            <span className="text-brand-mint mr-2">$</span>cat agenda_2026.log
           </div>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold text-brand-dark tracking-tight">
-            Próximos <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-ieee to-brand-salmon">Encuentros</span>
+          <h1 className="font-mono text-4xl md:text-6xl font-bold leading-snug tracking-tight text-brand-beige">
+            Próximos{' '}
+            <span
+              className="text-brand-mint"
+              style={{ textShadow: '0 0 24px rgba(155,204,177,0.55)' }}
+            >
+              Encuentros
+            </span>
           </h1>
-          <p className="text-lg md:text-xl text-brand-brown/80 max-w-2xl mx-auto font-sans">
+          <p className="text-lg md:text-xl text-[#9c9c94] max-w-2xl mx-auto font-sans">
             Únete a nuestras actividades. Desde charlas relajadas hasta sesiones de código intenso.
           </p>
         </motion.div>
 
-        {/* Lista de Eventos (Grid) */}
-        <motion.div 
+        {/* Lista de Eventos */}
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="show"
@@ -96,72 +107,85 @@ export default function PublicEventsPage() {
         >
           {publicEvents.map((event) => {
             const IconComponent = event.icon;
-            
+
             return (
-              <motion.div 
-                key={event.id}
-                variants={itemVariants}
-                whileHover={{ scale: 1.02 }}
-                className="relative group bg-white/80 backdrop-blur-xl border border-brand-steel/30 rounded-[2rem] p-6 md:p-10 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col md:flex-row items-center gap-8 md:gap-12"
-              >
-                {/* Degradado de fondo específico por evento */}
-                <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${event.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0`}></div>
-
-                {/* Columna Izquierda: Icono gigante */}
-                <div className="relative z-10 flex-shrink-0">
-                  <div className={`w-28 h-28 md:w-40 md:h-40 rounded-full bg-white border-8 border-white shadow-xl flex items-center justify-center relative overflow-hidden group-hover:rotate-6 transition-transform duration-500`}>
-                    <div className={`absolute inset-0 bg-gradient-to-b ${event.color} opacity-50`}></div>
-                    <IconComponent className={`w-12 h-12 md:w-16 md:h-16 ${event.iconColor} relative z-10`} />
-                  </div>
-                </div>
-
-                {/* Columna Derecha: Información */}
-                <div className="relative z-10 flex-1 w-full text-center md:text-left">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                    <h2 className="text-2xl md:text-4xl font-serif font-bold text-brand-dark">
-                      {event.title}
-                    </h2>
-                    <span className="inline-block px-3 py-1 bg-zinc-100 text-zinc-600 font-bold text-xs uppercase tracking-widest rounded-full whitespace-nowrap self-center md:self-auto">
-                      {event.tag}
-                    </span>
-                  </div>
-
-                  <p className="text-brand-brown/80 font-sans text-base md:text-lg mb-6 leading-relaxed">
-                    {event.description}
-                  </p>
-
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 md:gap-6 font-bold text-sm text-brand-dark">
-                    <div className="flex items-center gap-2 bg-white/50 px-4 py-2 rounded-xl border border-white shadow-sm">
-                      <Calendar className={`w-4 h-4 ${event.iconColor}`} />
-                      {event.date}
+              <motion.div key={event.id} variants={itemVariants}>
+                <TerminalWindow
+                  label={event.file}
+                  className="shadow-lg hover:border-brand-mint/40 transition-colors duration-300"
+                >
+                  <div className="relative p-6 md:p-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                    {/* Columna Izquierda: ícono */}
+                    <div className="flex-shrink-0">
+                      <div
+                        className="w-20 h-20 md:w-24 md:h-24 rounded-lg bg-black/30 border border-brand-terminal-border flex items-center justify-center transition-shadow duration-300"
+                        style={{ '--glow': event.accent } as React.CSSProperties}
+                        onMouseEnter={(e) => (e.currentTarget.style.boxShadow = `0 0 24px ${event.accent}33`)}
+                        onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
+                      >
+                        <IconComponent className={`w-9 h-9 md:w-10 md:h-10 ${event.iconColor}`} />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 bg-white/50 px-4 py-2 rounded-xl border border-white shadow-sm">
-                      <Clock className={`w-4 h-4 ${event.iconColor}`} />
-                      {event.time}
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/50 px-4 py-2 rounded-xl border border-white shadow-sm">
-                      <MapPin className={`w-4 h-4 ${event.iconColor}`} />
-                      {event.location}
+
+                    {/* Columna Derecha: información */}
+                    <div className="flex-1 w-full text-center md:text-left">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                        <h2 className="text-2xl md:text-3xl font-serif font-bold text-brand-beige">
+                          {event.title}
+                        </h2>
+                        <span className="inline-flex items-center gap-2 self-center md:self-auto px-3 py-1.5 bg-black/30 border border-brand-terminal-border font-mono font-bold text-[11px] uppercase tracking-widest rounded-md whitespace-nowrap">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ backgroundColor: event.accent, boxShadow: `0 0 6px ${event.accent}` }}
+                          />
+                          <span style={{ color: event.accent }}>{event.tag}</span>
+                        </span>
+                      </div>
+
+                      <p className="text-[#9c9c94] font-sans text-base md:text-lg mb-6 leading-relaxed">
+                        {event.description}
+                      </p>
+
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 font-mono text-xs md:text-[13px] text-brand-beige">
+                        <div className="flex items-center gap-2 bg-black/30 px-3.5 py-2 rounded-md border border-brand-terminal-border">
+                          <Calendar className={`w-3.5 h-3.5 ${event.iconColor}`} />
+                          {event.date}
+                        </div>
+                        <div className="flex items-center gap-2 bg-black/30 px-3.5 py-2 rounded-md border border-brand-terminal-border">
+                          <Clock className={`w-3.5 h-3.5 ${event.iconColor}`} />
+                          {event.time}
+                        </div>
+                        <div className="flex items-center gap-2 bg-black/30 px-3.5 py-2 rounded-md border border-brand-terminal-border">
+                          <MapPin className={`w-3.5 h-3.5 ${event.iconColor}`} />
+                          {event.location}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </TerminalWindow>
               </motion.div>
             );
           })}
         </motion.div>
 
         {/* Cierre / Call to action */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           className="mt-20 text-center"
         >
-          <p className="text-brand-brown font-medium mb-6">
-            ¿Ya eres parte de la comunidad?
+          <p className="text-[#9c9c94] font-mono text-sm mb-6">
+            <span className="text-brand-mint mr-2">$</span>¿ya eres parte de la comunidad?
           </p>
-          <a href="/login" className="inline-flex items-center justify-center px-8 py-3.5 font-bold text-brand-dark bg-transparent border-2 border-brand-dark rounded-xl hover:bg-brand-dark hover:text-white transition-all shadow-sm active:scale-95">
-            Ir a mi Dashboard
+          <a
+            href="/login"
+            className="inline-flex items-center justify-center px-8 py-3.5 font-mono font-bold text-[#0f1a15] bg-brand-mint rounded-md transition-all hover:-translate-y-0.5 active:scale-95"
+            style={{ boxShadow: '0 0 0 rgba(155,204,177,0)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0 0 22px rgba(155,204,177,0.5)')}
+            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = '0 0 0 rgba(155,204,177,0)')}
+          >
+            ir_a_mi_dashboard →
           </a>
         </motion.div>
 

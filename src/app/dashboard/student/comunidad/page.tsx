@@ -9,16 +9,16 @@ export default async function ComunidadHomePage() {
     <div className="max-w-4xl mx-auto space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-200 pb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-brand-terminal-border pb-8">
         <div>
-          <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">Comunidad TDPPNP</h1>
-          <p className="text-zinc-500 mt-2 text-lg">
+          <h1 className="font-mono text-3xl font-bold text-brand-beige tracking-tight">Comunidad TDPPNP</h1>
+          <p className="text-[#9c9c94] mt-2 text-lg">
             Intercambia ideas, dudas y proyectos con la comunidad.
           </p>
         </div>
-        <Link 
+        <Link
           href="/dashboard/student/comunidad/nuevo"
-          className="inline-flex items-center justify-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-zinc-800 transition-all shadow-sm hover:shadow-md active:scale-95"
+          className="inline-flex items-center justify-center gap-2 bg-brand-mint text-[#0f1a15] px-6 py-3 rounded-xl font-bold hover:brightness-110 transition-all active:scale-95"
         >
           <Plus size={20} />
           <span>Nueva Publicación</span>
@@ -28,27 +28,27 @@ export default async function ComunidadHomePage() {
       {/* Lista de Posts */}
       <div className="grid gap-4">
         {posts.length === 0 ? (
-          <div className="p-16 text-center bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-3xl">
-            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-              <MessageSquare className="text-zinc-400" size={28} />
+          <div className="p-16 text-center bg-black/20 border-2 border-dashed border-brand-terminal-border rounded-3xl">
+            <div className="bg-black/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquare className="text-[#6f6f68]" size={28} />
             </div>
-            <h3 className="text-zinc-900 font-bold text-xl mb-1">Silencio absoluto...</h3>
-            <p className="text-zinc-500 max-w-xs mx-auto">
+            <h3 className="text-brand-beige font-bold text-xl mb-1">Silencio absoluto...</h3>
+            <p className="text-[#9c9c94] max-w-xs mx-auto">
               Nadie ha publicado nada todavía. Sé valiente y rompe el hielo.
             </p>
           </div>
         ) : (
           posts.map((post) => (
-            <Link 
-              href={`/dashboard/student/comunidad/p/${post.id}`} 
-              key={post.id} 
-              className="group relative bg-white border border-zinc-200 rounded-2xl p-6 hover:border-zinc-900 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300"
+            <Link
+              href={`/dashboard/student/comunidad/p/${post.id}`}
+              key={post.id}
+              className="group relative bg-brand-terminal-panel border border-brand-terminal-border rounded-2xl p-6 hover:border-brand-mint/50 transition-all duration-300"
             >
               <div className="flex gap-5">
                 {/* Avatar / Inicial del Autor */}
                 <div className="hidden sm:flex flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200 text-zinc-600 group-hover:bg-zinc-900 group-hover:text-white transition-colors uppercase font-bold text-xs">
-                   
+                  <div className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center border border-brand-terminal-border text-[#9c9c94] group-hover:bg-brand-mint group-hover:text-[#0f1a15] transition-colors uppercase font-bold text-xs">
+
                     {post.user?.name?.charAt(0) || <User size={18} />}
                   </div>
                 </div>
@@ -56,39 +56,39 @@ export default async function ComunidadHomePage() {
                 <div className="flex-1 min-w-0">
                   {/* Metadatos */}
                   <div className="flex flex-wrap items-center gap-y-2 gap-x-3 mb-3">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-tighter border border-blue-100">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-black text-brand-steel bg-brand-steel/10 px-2 py-0.5 rounded uppercase tracking-tighter border border-brand-steel/30">
                       <Hash size={12} />
                       {post.community?.slug}
                     </span>
-                    <span className="text-zinc-300">|</span>
-                    <span className="flex items-center gap-1 text-xs text-zinc-500 font-medium">
-                     
+                    <span className="text-[#4a4a44]">|</span>
+                    <span className="flex items-center gap-1 text-xs text-[#9c9c94] font-medium">
+
                       {post.user?.name || 'Anónimo'}
                     </span>
-                    <span className="flex items-center gap-1 text-xs text-zinc-400">
+                    <span className="flex items-center gap-1 text-xs text-[#6f6f68]">
                       <Clock size={14} />
                       {new Date(post.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}
                     </span>
                   </div>
-                  
+
                   {/* Título y Extracto */}
-                  <h3 className="text-xl font-bold text-zinc-900 mb-2 leading-tight group-hover:underline decoration-zinc-300 underline-offset-4">
+                  <h3 className="text-xl font-bold text-brand-beige mb-2 leading-tight group-hover:underline decoration-brand-terminal-border underline-offset-4">
                     {post.title}
                   </h3>
-                  <p className="text-zinc-600 text-sm line-clamp-2 leading-relaxed mb-4">
+                  <p className="text-[#9c9c94] text-sm line-clamp-2 leading-relaxed mb-4">
                     {post.content}
                   </p>
-                  
+
                   {/* Footer - Interacciones */}
                   <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400 group-hover:text-zinc-900 transition-colors">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#6f6f68] group-hover:text-brand-mint transition-colors">
                       <MessageSquare size={16} />
-                      {post.comments?.[0]?.count || 0} 
+                      {post.comments?.[0]?.count || 0}
                       <span className="font-medium">comentarios</span>
                     </div>
-                    
+
                     {/* Indicador de "Leer más" */}
-                    <span className="text-xs font-bold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
+                    <span className="text-xs font-bold text-brand-mint opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
                       Leer discusión →
                     </span>
                   </div>

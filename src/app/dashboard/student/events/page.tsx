@@ -13,9 +13,9 @@ export default async function StudentEventsPage() {
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       
       {/* Encabezado */}
-      <div className="border-b border-zinc-200 pb-6">
-        <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">Próximos Eventos</h1>
-        <p className="text-zinc-500 mt-2 text-lg">
+      <div className="border-b border-brand-terminal-border pb-6">
+        <h1 className="font-mono text-3xl font-bold text-brand-beige tracking-tight">Próximos Eventos</h1>
+        <p className="text-[#9c9c94] mt-2 text-lg">
           Descubre seminarios, tutorías y reuniones de la comunidad.
         </p>
       </div>
@@ -23,12 +23,12 @@ export default async function StudentEventsPage() {
       {/* Lista de Eventos */}
       <div className="space-y-6">
         {events.length === 0 ? (
-          <div className="p-16 text-center bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-3xl">
-            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-              <Calendar className="text-zinc-400" size={28} />
+          <div className="p-16 text-center bg-black/20 border-2 border-dashed border-brand-terminal-border rounded-3xl">
+            <div className="bg-black/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="text-[#6f6f68]" size={28} />
             </div>
-            <h3 className="text-zinc-900 font-bold text-xl mb-1">Agenda libre</h3>
-            <p className="text-zinc-500 max-w-sm mx-auto">
+            <h3 className="text-brand-beige font-bold text-xl mb-1">Agenda libre</h3>
+            <p className="text-[#9c9c94] max-w-sm mx-auto">
               No hay eventos programados en este momento. Vuelve a revisar más tarde.
             </p>
           </div>
@@ -45,15 +45,15 @@ export default async function StudentEventsPage() {
             const participantCount = event.participants?.length || 0;
 
             return (
-              <div 
-                key={event.id} 
-                className="bg-white border border-zinc-200 rounded-2xl p-6 flex flex-col md:flex-row gap-6 hover:border-zinc-300 transition-colors shadow-sm"
+              <div
+                key={event.id}
+                className="bg-brand-terminal-panel border border-brand-terminal-border rounded-2xl p-6 flex flex-col md:flex-row gap-6 hover:border-brand-mint/40 transition-colors"
               >
-                
+
                 {/* Cuadro de Fecha (Izquierda) */}
-                <div className="flex-shrink-0 flex flex-col items-center justify-center bg-zinc-50 border border-zinc-200 rounded-xl w-20 h-24 shadow-inner">
-                  <span className="text-xs font-bold text-zinc-400 tracking-widest mb-1">{month}</span>
-                  <span className="text-3xl font-black text-zinc-900 leading-none">{day}</span>
+                <div className="flex-shrink-0 flex flex-col items-center justify-center bg-black/30 border border-brand-terminal-border rounded-xl w-20 h-24">
+                  <span className="text-xs font-bold text-[#6f6f68] tracking-widest mb-1">{month}</span>
+                  <span className="text-3xl font-black text-brand-beige leading-none">{day}</span>
                 </div>
 
                 {/* Contenido Central */}
@@ -62,38 +62,38 @@ export default async function StudentEventsPage() {
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       {/* Etiqueta Online/Presencial */}
                       {event.event_type === 'online' ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-black text-brand-steel bg-brand-steel/10 px-2 py-1 rounded uppercase tracking-wider">
                           <Video size={12} /> Online
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-black text-brand-mint bg-brand-mint/10 px-2 py-1 rounded uppercase tracking-wider">
                           <MapPin size={12} /> Presencial
                         </span>
                       )}
-                      
-                      <span className="text-zinc-300">•</span>
-                      <span className="flex items-center gap-1 text-xs font-bold text-zinc-500">
+
+                      <span className="text-[#4a4a44]">•</span>
+                      <span className="flex items-center gap-1 text-xs font-bold text-[#9c9c94]">
                         <Clock size={14} /> {time}
                       </span>
                     </div>
 
-                    <h3 className="text-xl font-bold text-zinc-900 mb-2 leading-tight">
+                    <h3 className="text-xl font-bold text-brand-beige mb-2 leading-tight">
                       {event.title}
                     </h3>
-                    <p className="text-zinc-600 text-sm whitespace-pre-wrap mb-4">
+                    <p className="text-[#9c9c94] text-sm whitespace-pre-wrap mb-4">
                       {event.description}
                     </p>
                   </div>
 
                   {/* Metadatos Inferiores */}
-                  <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-zinc-500">
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#9c9c94]">
                     <span className="flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-zinc-200 flex items-center justify-center text-[10px] text-zinc-700 font-bold">
+                      <span className="w-5 h-5 rounded-full bg-black/30 border border-brand-terminal-border flex items-center justify-center text-[10px] text-[#9c9c94] font-bold">
                         {event.instructor?.name?.charAt(0) || 'P'}
                       </span>
                       Por {event.instructor?.name || 'Profesor'}
                     </span>
-                    
+
                     <span className="flex items-center gap-1">
                       <Users size={14} />
                       {participantCount} {participantCount === 1 ? 'asistente' : 'asistentes'}
@@ -102,20 +102,20 @@ export default async function StudentEventsPage() {
                 </div>
 
                 {/* Área de Acción (Derecha) */}
-                <div className="flex-shrink-0 flex flex-col justify-center border-t border-zinc-100 pt-4 md:border-t-0 md:pt-0 md:border-l md:pl-6 md:w-48">
+                <div className="flex-shrink-0 flex flex-col justify-center border-t border-brand-terminal-border pt-4 md:border-t-0 md:pt-0 md:border-l md:pl-6 md:w-48">
                   {/* Detalles del Link/Lugar (Solo se muestran a los que asisten) */}
                   {isRegistered ? (
-                    <div className="mb-4 bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                      <span className="flex items-center gap-1 text-xs font-bold text-zinc-900 mb-1">
-                        <Info size={14} className="text-zinc-400" />
+                    <div className="mb-4 bg-black/30 p-3 rounded-lg border border-brand-terminal-border">
+                      <span className="flex items-center gap-1 text-xs font-bold text-brand-beige mb-1">
+                        <Info size={14} className="text-[#6f6f68]" />
                         {event.event_type === 'online' ? 'Enlace de acceso:' : 'Lugar del evento:'}
                       </span>
                       {event.event_type === 'online' ? (
-                        <a href={event.location_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:underline break-all">
+                        <a href={event.location_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand-mint hover:underline break-all">
                           Unirse a la llamada →
                         </a>
                       ) : (
-                        <span className="text-sm font-medium text-zinc-700">
+                        <span className="text-sm font-medium text-[#9c9c94]">
                           {event.location_url}
                         </span>
                       )}
@@ -124,12 +124,12 @@ export default async function StudentEventsPage() {
 
                   {/* Botón de RSVP con Server Actions */}
                   <form action={toggleEventRegistration.bind(null, event.id, isRegistered)}>
-                    <button 
+                    <button
                       type="submit"
                       className={`w-full py-2.5 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                        isRegistered 
-                          ? 'bg-white border-2 border-zinc-200 text-zinc-500 hover:border-red-200 hover:text-red-600 hover:bg-red-50' 
-                          : 'bg-zinc-900 text-white hover:bg-zinc-800 shadow-sm'
+                        isRegistered
+                          ? 'bg-black/30 border-2 border-brand-terminal-border text-[#9c9c94] hover:border-brand-salmon/40 hover:text-brand-salmon hover:bg-brand-salmon/10'
+                          : 'bg-brand-mint text-[#0f1a15] hover:brightness-110'
                       }`}
                     >
                       {isRegistered ? 'Cancelar asistencia' : 'Asistiré'}
