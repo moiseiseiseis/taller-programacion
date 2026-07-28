@@ -25,7 +25,16 @@ export async function GET(request: NextRequest) {
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) return response
+
+    // DEBUG temporal: mostrar el error real de Supabase para diagnosticar.
+    return NextResponse.redirect(
+      `${origin}/login?error=${encodeURIComponent('exchangeCodeForSession: ' + error.message)}`
+    )
   }
 
-  return NextResponse.redirect(`${origin}/login?error=El+enlace+no+es+válido+o+expiró`)
+  // DEBUG temporal: no llegó ningún ?code= en la URL.
+  const paramsSeen = Array.from(searchParams.keys()).join(',') || '(ninguno)'
+  return NextResponse.redirect(
+    `${origin}/login?error=${encodeURIComponent('Sin code. Params recibidos: ' + paramsSeen)}`
+  )
 }

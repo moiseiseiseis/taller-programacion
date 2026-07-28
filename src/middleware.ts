@@ -26,6 +26,15 @@ export async function middleware(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = req.nextUrl.pathname
 
+  // Red de seguridad: si el redirect_to de Supabase no matchea contra la lista
+  // de Redirect URLs configurada en el dashboard, cae al Site URL (la raíz)
+  // pero igual le pega el ?code= ahí. Lo reenviamos a nuestro callback real.
+  if (path === '/' && req.nextUrl.searchParams.has('code')) {
+    const callbackUrl = new URL('/auth/callback', req.url)
+    callbackUrl.search = req.nextUrl.search
+    return NextResponse.redirect(callbackUrl)
+  }
+
   if (path.startsWith('/dashboard')) {
     if (!user) {
       return NextResponse.redirect(new URL('/login', req.url))
