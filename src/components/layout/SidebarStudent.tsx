@@ -51,6 +51,7 @@ export default function SidebarStudent() {
           <Link onClick={() => setIsOpen(false)} href="/dashboard/student/calificaciones" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Mis Calificaciones</Link>
           <Link onClick={() => setIsOpen(false)} href="/dashboard/student/herramientas" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Directorio de Herramientas</Link>
           <Link onClick={() => setIsOpen(false)} href="/dashboard/student/events" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Eventos</Link>
+          <Link onClick={() => setIsOpen(false)} href="/dashboard/student/hackathon" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Hackathon</Link>
           <Link onClick={() => setIsOpen(false)} href="/dashboard/student/comunidad" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Comunidad</Link>
         </nav>
       </aside>
