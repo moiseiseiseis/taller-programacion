@@ -2,10 +2,13 @@ import { createClient } from '@/lib/supabase/server';
 import { enrollInWorkshop } from './actions';
 import Link from 'next/link';
 import { getOrderedLessons, calculateProgress } from '@/lib/lessonSequence';
+import { getPendingSurveyMomento } from '@/lib/anxietySurvey/triggers';
+import AnxietySurveyBanner from './AnxietySurveyBanner';
 
 export default async function StudentDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const pendingSurveyMomento = await getPendingSurveyMomento(supabase, user!.id);
 
   // OPTIMIZACIÓN
   const [workshopsResponse, enrollmentsResponse, completionsResponse] = await Promise.all([
@@ -44,6 +47,8 @@ export default async function StudentDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      {pendingSurveyMomento && <AnxietySurveyBanner momento={pendingSurveyMomento} />}
+
       <div>
         <h1 className="font-mono text-3xl font-bold text-brand-beige">Catálogo de Talleres</h1>
         <p className="text-[#9c9c94] mt-2">Explora e inscríbete en los talleres disponibles.</p>

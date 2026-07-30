@@ -5,9 +5,11 @@ import { updateWorkshopDescription } from '../../actions';
 export default function WorkshopSettings({
   workshopId,
   initialDescription,
+  initialIsCodeWorkshop,
 }: {
   workshopId: string;
   initialDescription: string | null;
+  initialIsCodeWorkshop: boolean;
 }) {
   return (
     <div className="bg-brand-terminal-panel p-6 rounded-2xl border border-brand-terminal-border">
@@ -24,12 +26,21 @@ export default function WorkshopSettings({
           placeholder="Resumen corto del taller."
           className="w-full rounded-lg border border-brand-terminal-border bg-black/30 px-4 py-3 text-brand-beige focus:border-brand-mint focus:ring-1 focus:ring-brand-mint outline-none placeholder:text-[#6f6f68]"
         />
+        <label className="flex items-start gap-2 text-sm text-brand-beige">
+          <input type="checkbox" name="is_code_workshop" defaultChecked={initialIsCodeWorkshop} className="accent-brand-mint mt-0.5" />
+          <span>
+            Es un taller de código
+            <span className="block text-xs text-[#6f6f68]">
+              Al completarlo por primera vez, dispara el Bloque B de la encuesta de investigación educativa.
+            </span>
+          </span>
+        </label>
         <div className="flex justify-end">
           <button
             type="submit"
             className="py-2 px-5 rounded-lg text-sm font-bold text-brand-beige bg-black/30 hover:bg-black/40 transition-colors border border-brand-terminal-border"
           >
-            Guardar abstract
+            Guardar
           </button>
         </div>
       </form>

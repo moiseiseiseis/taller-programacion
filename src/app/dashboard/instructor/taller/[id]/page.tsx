@@ -37,7 +37,11 @@ export default async function GestionarTallerPage({ params }: { params: Promise<
         <p className="text-[#9c9c94] mt-2">{workshop.description}</p>
       </div>
 
-      <WorkshopSettings workshopId={workshop.id} initialDescription={workshop.description} />
+      <WorkshopSettings
+        workshopId={workshop.id}
+        initialDescription={workshop.description}
+        initialIsCodeWorkshop={workshop.is_code_workshop ?? false}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 

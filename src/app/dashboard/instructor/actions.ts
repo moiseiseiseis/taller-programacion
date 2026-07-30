@@ -224,10 +224,11 @@ export async function updateWorkshopDescription(formData: FormData) {
   const supabase = await createClient();
   const workshop_id = formData.get('workshop_id') as string;
   const description = (formData.get('description') as string) || null;
+  const is_code_workshop = formData.get('is_code_workshop') === 'on';
 
   const { error } = await supabase
     .from('workshops')
-    .update({ description })
+    .update({ description, is_code_workshop })
     .eq('id', workshop_id);
 
   if (error) throw new Error(`Error al actualizar la descripción: ${error.message}`);
