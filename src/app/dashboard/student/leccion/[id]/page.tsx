@@ -10,6 +10,7 @@ import TerminalWorld, { type TerminalLevelData } from './TerminalWorld';
 import PythonWorld, { type PythonExerciseData } from './PythonWorld';
 import LogicPuzzleWorld, { type LogicPuzzleRowData } from './LogicPuzzleWorld';
 import ReflectionWorld, { type MetacogExerciseData } from './ReflectionWorld';
+import AlgorithmiaWorld, { type AlgorithmiaExerciseData } from './AlgorithmiaWorld';
 import { getOrderedLessons, getNextLessonId, getFirstLockedLessonId } from '@/lib/lessonSequence';
 import { getLessonQuizMaxScore, type LessonQuiz } from '@/lib/lessonQuiz';
 import type { LogicPuzzleData, LogicPuzzleSolution } from '@/lib/logicPuzzle/types';
@@ -259,6 +260,30 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
     }
   }
 
+  // 2.9. Si es una lección de simulación de Algoritmia, traemos el
+  // ejercicio y la entrega ya guardada (si hay).
+  let algorithmiaExercise: AlgorithmiaExerciseData | null = null;
+  let algorithmiaSubmission: { sim_result: unknown; reflection_response: string | null } | null = null;
+
+  if (lesson.type === 'algorithm_sim') {
+    const { data: exerciseData } = await supabase
+      .from('algorithmia_exercises')
+      .select('*')
+      .eq('lesson_id', id)
+      .maybeSingle();
+    algorithmiaExercise = exerciseData;
+
+    if (algorithmiaExercise) {
+      const { data: submissionData } = await supabase
+        .from('algorithmia_submissions')
+        .select('sim_result, reflection_response')
+        .eq('exercise_id', algorithmiaExercise.id)
+        .eq('user_id', user?.id)
+        .maybeSingle();
+      algorithmiaSubmission = submissionData;
+    }
+  }
+
   // 3. Buscamos los recursos adjuntos (PDFs)
   const { data: resources } = await supabase
     .from('lesson_resources')
@@ -433,6 +458,18 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
         ) : (
           <div className="bg-brand-terminal-panel p-12 rounded-2xl border border-dashed border-brand-terminal-border text-center">
             <p className="text-[#9c9c94] font-semibold">El instructor aún no ha configurado el ejercicio de esta unidad.</p>
+          </div>
+        )
+      ) : lesson.type === 'algorithm_sim' ? (
+        algorithmiaExercise ? (
+          <AlgorithmiaWorld
+            lessonId={lesson.id}
+            exercise={algorithmiaExercise}
+            initialSubmission={algorithmiaSubmission}
+          />
+        ) : (
+          <div className="bg-brand-terminal-panel p-12 rounded-2xl border border-dashed border-brand-terminal-border text-center">
+            <p className="text-[#9c9c94] font-semibold">El instructor aún no ha configurado la simulación de esta unidad.</p>
           </div>
         )
       ) : practice ? (

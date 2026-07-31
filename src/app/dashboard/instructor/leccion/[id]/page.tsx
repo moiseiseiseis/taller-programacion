@@ -10,6 +10,7 @@ import PythonExercisesEditor from './PythonExercisesEditor';
 import TerminalLevelsEditor from './TerminalLevelsEditor';
 import LogicPuzzlesEditor from './LogicPuzzlesEditor';
 import ReflectionExerciseEditor from './ReflectionExerciseEditor';
+import AlgorithmiaExerciseEditor from './AlgorithmiaExerciseEditor';
 
 export default async function GestionarLeccionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -124,6 +125,27 @@ export default async function GestionarLeccionPage({ params }: { params: Promise
     metacogExercise = data;
   }
 
+  // Traemos la simulación de Algoritmia (si aplica)
+  let algorithmiaExercise: {
+    id: string;
+    kind: string;
+    title: string;
+    dilemma: string;
+    theory: string;
+    config: unknown;
+    reflection_prompt: string;
+    explanation: string | null;
+    hint: string | null;
+  } | null = null;
+  if (lesson.type === 'algorithm_sim') {
+    const { data } = await supabase
+      .from('algorithmia_exercises')
+      .select('*')
+      .eq('lesson_id', id)
+      .maybeSingle();
+    algorithmiaExercise = data;
+  }
+
   // Traemos el inventario de herramientas del instructor
   const { data: availableTools } = await supabase
     .from('tools')
@@ -195,6 +217,8 @@ export default async function GestionarLeccionPage({ params }: { params: Promise
         <LogicPuzzlesEditor lessonId={lesson.id} puzzles={logicPuzzles} />
       ) : lesson.type === 'reflection' ? (
         <ReflectionExerciseEditor lessonId={lesson.id} exercise={metacogExercise} />
+      ) : lesson.type === 'algorithm_sim' ? (
+        <AlgorithmiaExerciseEditor lessonId={lesson.id} exercise={algorithmiaExercise} />
       ) : (
         <div className="p-12 border border-dashed border-brand-terminal-border rounded-2xl text-center bg-brand-terminal-panel">
           <p className="text-[#9c9c94] font-semibold text-lg">Tipo de lección no reconocido.</p>

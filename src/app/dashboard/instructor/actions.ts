@@ -624,6 +624,51 @@ export async function deleteMetacogExercise(formData: FormData) {
   return { success: true };
 }
 
+export async function saveAlgorithmiaExercise(formData: FormData) {
+  await requireRole('instructor');
+  const supabase = await createClient();
+
+  const exercise_id = formData.get('exercise_id') as string | null;
+  const lesson_id = formData.get('lesson_id') as string;
+  const kind = formData.get('kind') as string;
+  const title = formData.get('title') as string;
+  const dilemma = formData.get('dilemma') as string;
+  const theory = formData.get('theory') as string;
+  const reflection_prompt = formData.get('reflection_prompt') as string;
+  const explanation = (formData.get('explanation') as string) || null;
+  const hint = (formData.get('hint') as string) || null;
+
+  const config = parseOptionalJson(
+    formData.get('config_json') as string,
+    'El JSON de configuración (config) no es válido. Revisa el formato.'
+  );
+
+  const payload = { lesson_id, kind, title, dilemma, theory, reflection_prompt, explanation, config: config ?? {}, hint };
+
+  const { error } = exercise_id
+    ? await supabase.from('algorithmia_exercises').update(payload).eq('id', exercise_id)
+    : await supabase.from('algorithmia_exercises').insert(payload);
+
+  if (error) throw new Error(`Error de Supabase: ${error.message}`);
+
+  revalidatePath(`/dashboard/instructor/leccion/${lesson_id}`);
+  return { success: true };
+}
+
+export async function deleteAlgorithmiaExercise(formData: FormData) {
+  await requireRole('instructor');
+  const supabase = await createClient();
+
+  const exercise_id = formData.get('exercise_id') as string;
+  const lesson_id = formData.get('lesson_id') as string;
+
+  const { error } = await supabase.from('algorithmia_exercises').delete().eq('id', exercise_id);
+  if (error) throw new Error(`Error de Supabase: ${error.message}`);
+
+  revalidatePath(`/dashboard/instructor/leccion/${lesson_id}`);
+  return { success: true };
+}
+
 // Pone la rúbrica (3 niveles, no correcto/incorrecto) y un comentario en una
 // entrega reflexiva. No toca response ni lesson_completions: el avance del
 // alumno ya quedó marcado cuando guardó su respuesta, esto es solo

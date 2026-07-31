@@ -54,6 +54,7 @@ export default function LessonSettings({ lesson }: { lesson: any }) {
               <option value="python">Ejercicios de Python</option>
               <option value="logic">Acertijo de lógica</option>
               <option value="reflection">Ejercicio reflexivo</option>
+              <option value="algorithm_sim">Simulación de Algoritmia</option>
             </select>
           </div>
         </div>

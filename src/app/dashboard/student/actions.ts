@@ -284,3 +284,47 @@ export async function saveReflectionResponse(
   revalidatePath(`/dashboard/student/leccion/${lessonId}`);
   return { success: true };
 }
+
+// Guarda (o actualiza) el resultado de una simulación de Algoritmia + la
+// reflexión personal. Igual que Metacognición, el avance se marca al
+// guardar, no al acertar la simulación — ganar o no la corrida manual es
+// parcialmente cuestión de suerte, no una habilidad que aprobar.
+export async function saveAlgorithmiaSubmission(
+  exerciseId: string,
+  lessonId: string,
+  simResult: unknown,
+  reflectionResponse: string
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Debes iniciar sesión');
+
+  const { error } = await supabase
+    .from('algorithmia_submissions')
+    .upsert(
+      {
+        exercise_id: exerciseId,
+        user_id: user.id,
+        sim_result: simResult,
+        reflection_response: reflectionResponse,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'exercise_id,user_id' }
+    );
+
+  if (error) {
+    console.error('Error al guardar la simulación de Algoritmia:', error);
+    throw new Error('No se pudo guardar tu respuesta');
+  }
+
+  await supabase
+    .from('lesson_completions')
+    .upsert(
+      { lesson_id: lessonId, user_id: user.id },
+      { onConflict: 'lesson_id,user_id', ignoreDuplicates: true }
+    );
+
+  revalidatePath(`/dashboard/student/leccion/${lessonId}`);
+  return { success: true };
+}
