@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import WelcomeCarousel from '@/components/dashboard/WelcomeCarousel';
+import { INSTRUCTOR_WELCOME_CARDS } from './welcomeCards';
 
 export default async function InstructorDashboard() {
   const supabase = await createClient();
@@ -14,6 +16,13 @@ export default async function InstructorDashboard() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      <WelcomeCarousel
+        storageKey="welcome-dismissed-instructor"
+        title="Bienvenido/a a tu panel de instructor"
+        subtitle="Un repaso rápido de qué puedes hacer aquí — desliza o usa las flechas."
+        cards={INSTRUCTOR_WELCOME_CARDS}
+      />
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
         <div>
           <h1 className="font-mono text-2xl sm:text-3xl font-bold text-brand-beige">Mis Talleres</h1>

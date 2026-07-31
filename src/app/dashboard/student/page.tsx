@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { getOrderedLessons, calculateProgress } from '@/lib/lessonSequence';
 import { getPendingSurveyMomento } from '@/lib/anxietySurvey/triggers';
 import AnxietySurveyBanner from './AnxietySurveyBanner';
+import WelcomeCarousel from '@/components/dashboard/WelcomeCarousel';
+import { STUDENT_WELCOME_CARDS } from './welcomeCards';
 
 export default async function StudentDashboard() {
   const supabase = await createClient();
@@ -47,6 +49,13 @@ export default async function StudentDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      <WelcomeCarousel
+        storageKey="welcome-dismissed-student"
+        title="Bienvenido/a a tu panel de alumno"
+        subtitle="Un repaso rápido de qué puedes hacer aquí — desliza o usa las flechas."
+        cards={STUDENT_WELCOME_CARDS}
+      />
+
       {pendingSurveyMomento && <AnxietySurveyBanner momento={pendingSurveyMomento} />}
 
       <div>
