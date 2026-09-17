@@ -57,6 +57,7 @@ export default function SidebarInstructor() {
           <Link onClick={() => setIsOpen(false)} href="/dashboard/instructor/events/nuevo" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Eventos (crear)</Link>
           <Link onClick={() => setIsOpen(false)} href="/dashboard/instructor/events" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Eventos (detalles) </Link>
           <Link onClick={() => setIsOpen(false)} href="/dashboard/instructor/hackathon" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Hackathon</Link>
+          <Link onClick={() => setIsOpen(false)} href="/dashboard/instructor/datos" className="block px-4 py-2 rounded-md text-[#9c9c94] hover:bg-black/30 hover:text-brand-mint transition-colors">Datos de Investigación</Link>
         </nav>
       </aside>
     </>
