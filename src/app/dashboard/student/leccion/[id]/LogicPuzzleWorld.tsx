@@ -5,6 +5,7 @@ import { Check, Lock } from 'lucide-react';
 import AssignmentBoard from '@/components/logic/AssignmentBoard';
 import ChoiceCard from '@/components/logic/ChoiceCard';
 import MarkdownContent from '@/components/lessons/MarkdownContent';
+import ExerciseInstructions from '@/components/lessons/ExerciseInstructions';
 import { checkLogicPuzzle } from '@/lib/logicPuzzle/checker';
 import type { AssignmentAnswer, LogicPuzzleAnswer, LogicPuzzleData, LogicPuzzleSolution } from '@/lib/logicPuzzle/types';
 import { completeLogicPuzzle } from '../../actions';
@@ -162,6 +163,20 @@ function PuzzlePlayer({
   );
   const [choiceAnswer, setChoiceAnswer] = useState<string | null>(null);
 
+  const instructions =
+    puzzle.puzzle_data.kind === 'assignment'
+      ? [
+          'Cada fila es una entidad del caso y cada columna una opción posible; haz clic en la celda que corresponda para asignarla.',
+          'Si te equivocas, vuelve a hacer clic en la misma celda para quitar esa marca.',
+          'Si hay más de una tabla, complétalas todas antes de comprobar tu hipótesis.',
+          'Cuando termines de marcar tu hipótesis, presiona "Comprobar" para ver si coincide con la evidencia del caso.',
+        ]
+      : [
+          'Lee el planteo y elige una única opción entre las tarjetas.',
+          'Haz clic en una tarjeta para seleccionarla; puedes cambiar tu elección las veces que quieras antes de comprobar.',
+          'Cuando estés seguro de tu respuesta, presiona "Comprobar" para verificarla.',
+        ];
+
   function handleToggle(boardId: string, entityId: string, optionId: string) {
     setChecked(false);
     setAssignmentAnswer((prev) => {
@@ -226,6 +241,8 @@ function PuzzlePlayer({
           <MarkdownContent content={puzzle.prompt} />
         </div>
       </div>
+
+      <ExerciseInstructions items={instructions} />
 
       {puzzle.puzzle_data.kind === 'assignment' ? (
         <AssignmentBoard boards={puzzle.puzzle_data.boards} answer={assignmentAnswer} onToggle={handleToggle} />

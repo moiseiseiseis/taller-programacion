@@ -1,6 +1,8 @@
 'use client';
 
 import MarkdownContent from '@/components/lessons/MarkdownContent';
+import ExerciseInstructions from '@/components/lessons/ExerciseInstructions';
+import { ALGORITHMIA_INSTRUCTIONS } from '@/lib/algorithmia/exerciseInstructions';
 import OptimalStoppingSim, { type StoppingSimResult } from '@/components/algorithmia/OptimalStoppingSim';
 import ExploreExploitSim, { type BanditSimResult } from '@/components/algorithmia/ExploreExploitSim';
 import SortingCostSim, { type SortingSimResult } from '@/components/algorithmia/SortingCostSim';
@@ -74,6 +76,8 @@ export default function AlgorithmiaWorld({
       <div className="border-t border-brand-terminal-border pt-6">
         <MarkdownContent content={exercise.theory} />
       </div>
+
+      <ExerciseInstructions items={ALGORITHMIA_INSTRUCTIONS[exercise.kind] ?? []} />
 
       {exercise.kind === 'optimal_stopping' ? (
         <OptimalStoppingSim

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Check, Lock } from 'lucide-react';
 import PyodideCodeRunner from '@/components/python/PyodideCodeRunner';
 import MarkdownContent from '@/components/lessons/MarkdownContent';
+import ExerciseInstructions from '@/components/lessons/ExerciseInstructions';
 import { completePythonExercise } from '../../actions';
 import LessonQuizGate from './LessonQuizGate';
 import type { PythonTestSpec } from '@/lib/pythonTestSpec';
@@ -145,6 +146,21 @@ function ExercisePlayer({
   const [solved, setSolved] = useState(isSolved);
   const [isSaving, setIsSaving] = useState(false);
 
+  const instructions =
+    exercise.kind === 'guided'
+      ? [
+          'Completa o corrige el código en el editor siguiendo el enunciado; ya viene con una base de partida (starter code).',
+          'Presiona "Ejecutar" para ver la salida en la consola y confirmar que el programa corre sin errores.',
+          'Cuando el resultado te parezca correcto, presiona "Comprobar" para validarlo contra los tests automáticos de este ejercicio.',
+          'Si "Comprobar" marca un error, lee el detalle, ajusta el código y vuelve a intentarlo las veces que necesites.',
+        ]
+      : [
+          'Escribe el código desde cero en el editor para resolver el problema planteado en el enunciado.',
+          'Usa "Ejecutar" para probar tu código y revisar la salida antes de darlo por terminado.',
+          'Presiona "Comprobar" cuando quieras validar tu solución contra los tests automáticos de este ejercicio.',
+          'Puedes seguir editando y volviendo a comprobar tantas veces como lo necesites.',
+        ];
+
   async function handleResult(passed: boolean) {
     if (!passed || solved) return;
     setSolved(true);
@@ -167,6 +183,8 @@ function ExercisePlayer({
           <MarkdownContent content={exercise.prompt} />
         </div>
       </div>
+
+      <ExerciseInstructions items={instructions} />
 
       <PyodideCodeRunner
         starterCode={exercise.starter_code}
