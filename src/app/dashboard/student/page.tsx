@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { getOrderedLessons, calculateProgress } from '@/lib/lessonSequence';
 import { getPendingSurveyMomento } from '@/lib/anxietySurvey/triggers';
 import AnxietySurveyBanner from './AnxietySurveyBanner';
+import { getPendingUxSurvey } from '@/lib/uxSurvey/triggers';
+import UxSurveyBanner from './UxSurveyBanner';
 import WelcomeCarousel from '@/components/dashboard/WelcomeCarousel';
 import { STUDENT_WELCOME_CARDS } from './welcomeCards';
 
@@ -27,6 +29,7 @@ export default async function StudentDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const pendingSurveyMomento = await getPendingSurveyMomento(supabase, user!.id);
+  const pendingUxSurvey = await getPendingUxSurvey(supabase, user!.id);
 
   // OPTIMIZACIÓN
   const [workshopsResponse, enrollmentsResponse, completionsResponse, pathResponse] = await Promise.all([
@@ -87,6 +90,7 @@ export default async function StudentDashboard() {
       />
 
       {pendingSurveyMomento && <AnxietySurveyBanner momento={pendingSurveyMomento} />}
+      {pendingUxSurvey && <UxSurveyBanner survey={pendingUxSurvey} />}
 
       {pathWorkshops.length > 0 && (
         <div className="space-y-4">
