@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import EventTicker from '@/components/layout/EventTicker';
 import TerminalWindow from '@/components/layout/TerminalWindow';
+import SubmitButton from '@/components/ui/SubmitButton';
 
 export default function RegisterPage() {
   return (
@@ -65,12 +66,13 @@ function RegisterForm() {
               />
             </div>
 
-            <button
+            <SubmitButton
               formAction={signup}
-              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 transition-all mt-4"
+              pendingText="Creando cuenta"
+              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 mt-4"
             >
-              Entrar a la PLataforma
-            </button>
+              Entrar a la Plataforma
+            </SubmitButton>
 
             <p className="text-sm text-center font-sans mt-2 text-[#9c9c94]">
               ¿Ya tienes cuenta?{' '}

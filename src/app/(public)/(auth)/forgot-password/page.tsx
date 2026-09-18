@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import EventTicker from '@/components/layout/EventTicker';
 import TerminalWindow from '@/components/layout/TerminalWindow';
+import SubmitButton from '@/components/ui/SubmitButton';
 
 export default function ForgotPasswordPage() {
   return (
@@ -53,12 +54,13 @@ function ForgotPasswordForm() {
               />
             </div>
 
-            <button
+            <SubmitButton
               formAction={requestPasswordReset}
-              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 transition-all mt-2 sm:mt-4"
+              pendingText="Enviando"
+              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 mt-2 sm:mt-4"
             >
               Enviar Enlace
-            </button>
+            </SubmitButton>
 
             <p className="text-xs sm:text-sm text-center font-sans mt-2 text-[#9c9c94]">
               <Link href="/login" className="text-brand-mint font-bold hover:text-brand-salmon transition-colors">

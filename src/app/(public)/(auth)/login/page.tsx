@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import EventTicker from '@/components/layout/EventTicker';
 import TerminalWindow from '@/components/layout/TerminalWindow';
+import SubmitButton from '@/components/ui/SubmitButton';
 
 export default function LoginPage() {
   return (
@@ -70,12 +71,13 @@ function LoginForm() {
               </Link>
             </div>
 
-            <button
+            <SubmitButton
               formAction={login}
-              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 transition-all mt-2 sm:mt-4"
+              pendingText="Autenticando"
+              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 mt-2 sm:mt-4"
             >
               Entrar a la Plataforma
-            </button>
+            </SubmitButton>
 
             <p className="text-xs sm:text-sm text-center font-sans mt-2 text-[#9c9c94]">
               ¿No tienes cuenta?{' '}

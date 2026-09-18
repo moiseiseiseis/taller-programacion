@@ -1,4 +1,5 @@
 import { completeProfile } from './actions';
+import SubmitButton from '@/components/ui/SubmitButton';
 
 export default function OnboardingPage() {
   return (
@@ -52,12 +53,12 @@ export default function OnboardingPage() {
           </div>
 
           {/* Botón de Submit */}
-          <button
-            type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-black hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all"
+          <SubmitButton
+            pendingText="Guardando"
+            className="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-black hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
           >
             Guardar y entrar a la plataforma
-          </button>
+          </SubmitButton>
         </form>
         
       </div>

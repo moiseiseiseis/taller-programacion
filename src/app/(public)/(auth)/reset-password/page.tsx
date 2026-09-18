@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import EventTicker from '@/components/layout/EventTicker';
 import TerminalWindow from '@/components/layout/TerminalWindow';
+import SubmitButton from '@/components/ui/SubmitButton';
 
 export default function ResetPasswordPage() {
   return (
@@ -66,12 +67,13 @@ function ResetPasswordForm() {
               />
             </div>
 
-            <button
+            <SubmitButton
               formAction={updatePassword}
-              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 transition-all mt-2 sm:mt-4"
+              pendingText="Guardando"
+              className="w-full bg-brand-mint text-[#0f1a15] font-sans font-bold p-3 rounded-lg hover:brightness-110 mt-2 sm:mt-4"
             >
               Guardar Contraseña
-            </button>
+            </SubmitButton>
           </form>
         </TerminalWindow>
       </motion.div>
