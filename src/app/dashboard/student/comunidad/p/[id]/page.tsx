@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server'; 
-import Link from 'next/link'; 
-import { 
+import { getAuthUser } from '@/lib/auth';
+import Link from 'next/link';
+import {
   getPostById, 
   createComment, 
   toggleLockPost, 
@@ -19,14 +19,8 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   }
 
   // 1. Verificamos si el usuario actual es instructor
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  let isInstructor = false;
-  
-  if (user) {
-    const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
-    isInstructor = profile?.role === 'instructor';
-  }
+  const { role } = await getAuthUser();
+  const isInstructor = role === 'instructor';
 
   // 2. Ordenamos los comentarios (Las respuestas avaladas van primero, luego por fecha)
   const sortedComments = post.comments?.sort((a: any, b: any) => {

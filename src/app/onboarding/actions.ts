@@ -1,13 +1,14 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server'; 
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getAuthUser } from '@/lib/auth';
 
 export async function completeProfile(formData: FormData) {
   const supabase = await createClient();
-  
+
   // 1. Verificamos quién es el usuario logueado
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) {
     redirect('/login');

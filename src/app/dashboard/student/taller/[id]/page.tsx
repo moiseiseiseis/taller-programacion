@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Check, Lock, BookOpen, Code2, Trophy } from 'lucide-react';
@@ -14,7 +15,7 @@ const categoryStyles: Record<string, { label: string, color: string }> = {
 export default async function StudentWorkshopPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   // 1. Traemos el taller con todos sus módulos y lecciones ordenadas
   const { data: workshop, error: workshopError } = await supabase

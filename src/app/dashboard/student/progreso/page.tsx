@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import Link from 'next/link';
 import { getOrderedLessons, calculateProgress } from '@/lib/lessonSequence';
 
 export default async function StudentProgressPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   const { data: enrollments } = await supabase
     .from('enrollments')

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import { getOrderedLessons } from '@/lib/lessonSequence';
 
 type QuizAttempt = { score: number; passed: boolean; created_at: string };
@@ -12,7 +13,7 @@ const statusLabel: Record<string, { label: string; color: string }> = {
 
 export default async function StudentGradesPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   const { data: enrollments } = await supabase
     .from('enrollments')

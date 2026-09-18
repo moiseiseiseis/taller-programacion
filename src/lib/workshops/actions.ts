@@ -2,11 +2,12 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getAuthUser } from '@/lib/auth'
 
 // Crear un nuevo taller (Solo Instructor/Admin)
 export async function createWorkshop(formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
 
   const workshopData = {
     title: formData.get('title') as string,

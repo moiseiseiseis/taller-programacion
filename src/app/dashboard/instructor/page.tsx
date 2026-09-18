@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import Link from 'next/link';
 import WelcomeCarousel from '@/components/dashboard/WelcomeCarousel';
 import { INSTRUCTOR_WELCOME_CARDS } from './welcomeCards';
 
 export default async function InstructorDashboard() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   // Obtenemos solo los talleres creados por este instructor específico
   const { data: workshops } = await supabase

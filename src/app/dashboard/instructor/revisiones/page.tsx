@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import Link from 'next/link';
 
 export default async function RevisionesPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   
   const { data: rawSubmissions } = await supabase

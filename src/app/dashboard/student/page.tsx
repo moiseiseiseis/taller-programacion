@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import { enrollInWorkshop } from './actions';
 import Link from 'next/link';
 import { getOrderedLessons, calculateProgress } from '@/lib/lessonSequence';
@@ -27,7 +28,7 @@ type LearningPathRow = {
 
 export default async function StudentDashboard() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
   const pendingSurveyMomento = await getPendingSurveyMomento(supabase, user!.id);
   const pendingUxSurvey = await getPendingUxSurvey(supabase, user!.id);
 

@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import { toggleWorkshopStatus, deleteWorkshop } from '../actions';
 import Link from 'next/link';
 
 export default async function GestionTalleresPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   const { data: workshops } = await supabase
     .from('workshops')

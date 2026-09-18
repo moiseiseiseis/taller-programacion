@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { PartyPopper } from 'lucide-react';
@@ -26,7 +27,7 @@ const categoryStyles: Record<string, { label: string, color: string }> = {
 export default async function StudentLessonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   // 1. Buscamos la lección
   const { data: lesson } = await supabase

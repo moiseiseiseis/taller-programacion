@@ -35,30 +35,14 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(callbackUrl)
   }
 
-  if (path.startsWith('/dashboard')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
-
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    const role = userData?.role || 'student'
-
-    if (path === '/dashboard') {
-      return NextResponse.redirect(new URL(`/dashboard/${role}`, req.url))
-    }
-
-    if ((path.startsWith('/dashboard/instructor') || path.startsWith('/dashboard/admin')) && role === 'student') {
-      return NextResponse.redirect(new URL('/dashboard/student', req.url))
-    }
-
-    if (path.startsWith('/dashboard/admin') && role !== 'admin') {
-      return NextResponse.redirect(new URL(`/dashboard/${role}`, req.url))
-    }
+  // Solo el chequeo optimista (¿hay sesión?) va aquí. El rol requiere una
+  // consulta a Postgres, y el middleware corre en TODAS las rutas —incluidos
+  // los prefetches de <Link>—, así que esa consulta se movió a
+  // dashboard/layout.tsx y a los layouts de instructor/admin, donde corre
+  // una sola vez por request (memoizada con React cache) en vez de en cada
+  // ruta y prefetch.
+  if (path.startsWith('/dashboard') && !user) {
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
   return res

@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import PracticeForm from './PracticeForm'; 
+import PracticeForm from './PracticeForm';
 import LessonSettings from './LessonSettings';
 import TheoryEditor from './TheoryEditor';
 import ToolSelector from './ToolSelector';
@@ -15,7 +16,7 @@ import AlgorithmiaExerciseEditor from './AlgorithmiaExerciseEditor';
 export default async function GestionarLeccionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   // Traemos la lección y cruzamos datos
   const { data: lesson } = await supabase

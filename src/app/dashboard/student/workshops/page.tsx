@@ -1,5 +1,6 @@
 import { getActiveWorkshops } from '@/lib/workshops/actions';
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import EnrollButton from './EnrollButton';
 import { getOrderedLessons, calculateProgress } from '@/lib/lessonSequence';
 
@@ -7,7 +8,7 @@ export default async function StudentWorkshopsPage() {
   const workshops = await getActiveWorkshops();
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   // Traemos los IDs de los talleres a los que este alumno ya está inscrito
   const { data: userEnrollments } = await supabase

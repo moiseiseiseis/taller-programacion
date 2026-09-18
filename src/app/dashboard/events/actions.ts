@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { requireRole } from '@/lib/auth';
+import { requireRole, getAuthUser } from '@/lib/auth';
 
 // --- ACCIONES DE INSTRUCTOR ---
 
@@ -74,7 +74,7 @@ export async function getUpcomingEvents() {
 // 5. Registrarse o cancelar asistencia a un evento (Toggle)
 export async function toggleEventRegistration(eventId: string, isRegistered: boolean) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
   if (!user) throw new Error("Debes iniciar sesión");
 
   if (isRegistered) {

@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 
 export default async function AlumnosInscritosPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
   const { data: enrollments, error } = await supabase
     .from('workshop_enrollments')
     .select(`

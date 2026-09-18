@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { requireRole } from '@/lib/auth';
+import { requireRole, getAuthUser } from '@/lib/auth';
 
 export async function getCommunities() {
   const supabase = await createClient();
@@ -36,7 +36,7 @@ export async function getPosts(communitySlug?: string) {
 
 export async function createPost(formData: FormData) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) {
     throw new Error("Debes iniciar sesión para publicar");
@@ -96,7 +96,7 @@ export async function getPostById(id: string) {
 
 export async function createComment(formData: FormData) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error("Debes iniciar sesión para comentar");
 

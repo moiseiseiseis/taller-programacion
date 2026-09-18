@@ -4,12 +4,13 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { scoreLessonQuiz, getLessonQuizMaxScore, type LessonQuiz, type LessonQuizAnswer } from '@/lib/lessonQuiz';
+import { getAuthUser } from '@/lib/auth';
 
 export async function enrollInWorkshop(formData: FormData) {
   const supabase = await createClient();
   const workshop_id = formData.get('workshop_id') as string;
   
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 
@@ -35,7 +36,7 @@ export async function enrollInWorkshop(formData: FormData) {
 
 export async function submitCode(formData: FormData) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Usuario no autenticado');
 
@@ -84,7 +85,7 @@ export async function submitCode(formData: FormData) {
 
 export async function submitLessonQuiz(lessonId: string, answers: LessonQuizAnswer[]) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 
@@ -127,7 +128,7 @@ export async function submitLessonQuiz(lessonId: string, answers: LessonQuizAnsw
 // el progreso visible: checkmarks, barras de %, "Mi Progreso".
 export async function markLessonComplete(lessonId: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 
@@ -153,7 +154,7 @@ export async function markLessonComplete(lessonId: string) {
 // falta aprobar el quiz mixto de cierre, y eso lo maneja submitLessonQuiz.
 export async function completePythonExercise(exerciseId: string, lessonId: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 
@@ -178,7 +179,7 @@ export async function completePythonExercise(exerciseId: string, lessonId: strin
 // lección de tipo 'logic' todavía le falta aprobar el quiz de cierre.
 export async function completeLogicPuzzle(puzzleId: string, lessonId: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 
@@ -203,7 +204,7 @@ export async function completeLogicPuzzle(puzzleId: string, lessonId: string) {
 // completa también, para que se integre al progreso general.
 export async function completeTerminalLevel(levelId: string, lessonId: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 
@@ -252,7 +253,7 @@ export async function saveReflectionResponse(
   referencedLessonId: string | null
 ) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 
@@ -296,7 +297,7 @@ export async function saveAlgorithmiaSubmission(
   reflectionResponse: string
 ) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   if (!user) throw new Error('Debes iniciar sesión');
 

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import Link from 'next/link';
 import TeamPicker from './TeamPicker';
 import { leaveTeam, saveSubmission, requestLevelChange } from './actions';
@@ -6,9 +7,7 @@ import { computeSubmissionTotal } from '@/lib/hackathon/rubricScoring';
 
 export default async function StudentHackathonPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   // No se filtra por status='open' aquí: un alumno que ya tiene registro/equipo
   // tiene que poder seguir viendo su hub (entrega, resultado) aunque el

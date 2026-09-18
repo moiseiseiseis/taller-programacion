@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import { addTool, deleteTool } from './actions';
 
 export default async function HerramientasPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   // Traemos todas las herramientas creadas por este instructor
   const { data: tools } = await supabase

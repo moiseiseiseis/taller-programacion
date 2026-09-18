@@ -1,13 +1,12 @@
-import { getUpcomingEvents, toggleEventRegistration } from '@/app/dashboard/events/actions'; 
-import { createClient } from '@/lib/supabase/server';
+import { getUpcomingEvents, toggleEventRegistration } from '@/app/dashboard/events/actions';
+import { getAuthUser } from '@/lib/auth';
 import { Calendar, MapPin, Video, Users, Clock, Info } from 'lucide-react';
 
 export default async function StudentEventsPage() {
   const events = await getUpcomingEvents();
-  
+
   // Obtenemos al usuario actual para saber a qué eventos ya confirmó asistencia
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">

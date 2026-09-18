@@ -1,5 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth'
 import Navbar from '@/components/layout/Navbar'
 import SidebarStudent from '@/components/layout/SidebarStudent'
 import SidebarInstructor from '@/components/layout/SidebarInstructor'
@@ -10,28 +10,17 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user, role, name } = await getAuthUser()
 
   if (!user) {
     redirect('/login')
   }
 
-  // 1. Modificamos el select para traer también el 'name'
-  const { data: userData } = await supabase
-    .from('users')
-    .select('role, name')
-    .eq('id', user.id)
-    .single()
-
-  // 2.Si el usuario no tiene nombre, lo mandamos a completar su perfil
+  // Si el usuario no tiene nombre, lo mandamos a completar su perfil
   // (Hacemos esto antes de procesar cualquier cosa visual del dashboard)
-  if (!userData?.name) {
+  if (!name) {
     redirect('/onboarding')
   }
-
-  // 3.le asignamos su rol (o student por defecto)
-  const role = userData?.role || 'student'
 
   return (
     <div className="min-h-screen bg-brand-terminal flex flex-col font-serif text-brand-beige">

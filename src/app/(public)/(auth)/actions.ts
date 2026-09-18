@@ -20,15 +20,16 @@ export async function login(formData: FormData) {
   }
 
   // inicio de sesion con supabase
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { data: signInData, error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
     redirect('/login?error=No+se+pudo+iniciar+sesion')
   }
 
   // 2. se rastrea el rol del usuario para redireccionar a la ruta correcta
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  // (usamos el user que ya devolvió signInWithPassword, sin pedirlo de nuevo)
+  const user = signInData.user
+
   if (user) {
     const { data: profile } = await supabase
       .from('users')

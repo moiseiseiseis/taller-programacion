@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getAuthUser } from '@/lib/auth';
 import { notFound } from 'next/navigation';
 import { chooseLevel } from '../../actions';
 
@@ -11,9 +12,7 @@ export default async function ConfirmarNivelPage({
   if (!event_id) notFound();
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getAuthUser();
 
   const [{ data: levels }, { data: response }] = await Promise.all([
     supabase.from('hackathon_levels').select('*').eq('event_id', event_id).order('order_index', { ascending: true }),
