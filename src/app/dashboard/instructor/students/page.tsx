@@ -5,7 +5,7 @@ export default async function AlumnosInscritosPage() {
   const supabase = await createClient();
   const { user } = await getAuthUser();
   const { data: enrollments, error } = await supabase
-    .from('workshop_enrollments')
+    .from('enrollments')
     .select(`
       workshop_id,
       users ( id, name, email, career ),
