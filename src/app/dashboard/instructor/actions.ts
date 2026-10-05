@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth';
 import { parseOptionalJson } from '@/lib/parseOptionalJson';
+import { getOrderedLessons, calculateProgress } from '@/lib/lessonSequence';
 
 export async function createWorkshop(formData: FormData) {
   const instructorId = await requireRole('instructor');
@@ -690,4 +691,48 @@ export async function gradeReflectionSubmission(formData: FormData) {
 
   revalidatePath('/dashboard/instructor/revisiones');
   redirect('/dashboard/instructor/revisiones');
+}
+
+// Emite el certificado de un alumno para uno de los talleres del instructor.
+// El progreso se recalcula aquí mismo (nunca se confía en lo que mande el
+// cliente): solo se emite si el alumno completó el 100% de las lecciones,
+// lo cual ya incluye haber aprobado cualquier quiz del taller (pasar un
+// quiz marca la lección como completada). Reemitir (mismo alumno + taller)
+// actualiza la fecha y quién lo emitió, gracias al UNIQUE (user_id, workshop_id).
+export async function issueCertificate(workshopId: string, studentId: string) {
+  const instructorId = await requireRole('instructor');
+  const supabase = await createClient();
+
+  const { data: workshop } = await supabase
+    .from('workshops')
+    .select('id, created_by')
+    .eq('id', workshopId)
+    .single();
+
+  if (!workshop || workshop.created_by !== instructorId) {
+    throw new Error('No tienes permiso sobre este taller');
+  }
+
+  const ordered = await getOrderedLessons(supabase, workshopId);
+  const { data: completions } = await supabase
+    .from('lesson_completions')
+    .select('lesson_id')
+    .eq('user_id', studentId);
+  const completedLessonIds = new Set((completions ?? []).map((c: { lesson_id: string }) => c.lesson_id));
+
+  const progress = calculateProgress(ordered, completedLessonIds);
+  if (progress.percent < 100) {
+    throw new Error('El alumno todavía no completó el taller');
+  }
+
+  const { error } = await supabase
+    .from('certificates')
+    .upsert(
+      { user_id: studentId, workshop_id: workshopId, issued_by: instructorId, issued_at: new Date().toISOString() },
+      { onConflict: 'user_id,workshop_id' }
+    );
+
+  if (error) throw new Error(`No se pudo emitir el certificado: ${error.message}`);
+
+  revalidatePath('/dashboard/instructor/students');
 }
