@@ -52,9 +52,9 @@ export default async function AlumnosInscritosPage() {
   // Certificados ya emitidos (RLS ya los limita a los talleres de este instructor).
   const { data: certificates } = await supabase
     .from('certificates')
-    .select('user_id, workshop_id, issued_at');
+    .select('id, user_id, workshop_id, issued_at');
   const certByKey = new Map(
-    (certificates ?? []).map((c) => [`${c.user_id}:${c.workshop_id}`, c.issued_at as string])
+    (certificates ?? []).map((c) => [`${c.user_id}:${c.workshop_id}`, { id: c.id as string, issuedAt: c.issued_at as string }])
   );
 
   const withProgress = rows.map((enrollment) => {
@@ -63,8 +63,8 @@ export default async function AlumnosInscritosPage() {
     const ordered = orderedByWorkshop.get(enrollment.workshop_id) ?? [];
     const completed = (alumno && completedByStudent.get(alumno.id)) || new Set<string>();
     const progress = calculateProgress(ordered, completed);
-    const issuedAt = alumno ? certByKey.get(`${alumno.id}:${enrollment.workshop_id}`) : undefined;
-    return { enrollment, alumno, taller, progress, issuedAt };
+    const certificate = alumno ? certByKey.get(`${alumno.id}:${enrollment.workshop_id}`) : undefined;
+    return { enrollment, alumno, taller, progress, certificate };
   });
 
   return (
@@ -88,7 +88,7 @@ export default async function AlumnosInscritosPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-terminal-border">
-                {withProgress.map(({ enrollment, alumno, taller, progress, issuedAt }, idx) => (
+                {withProgress.map(({ enrollment, alumno, taller, progress, certificate }, idx) => (
                   <tr key={idx} className="hover:bg-black/20 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-brand-beige">{alumno?.name || 'Sin nombre'}</div>
@@ -108,10 +108,20 @@ export default async function AlumnosInscritosPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
-                      {issuedAt ? (
-                        <span className="text-xs font-bold text-brand-mint">
-                          Emitido {new Date(issuedAt).toLocaleDateString('es-MX')}
-                        </span>
+                      {certificate ? (
+                        <div className="flex items-center justify-end gap-3">
+                          <span className="text-xs font-bold text-brand-mint">
+                            Emitido {new Date(certificate.issuedAt).toLocaleDateString('es-MX')}
+                          </span>
+                          <a
+                            href={`/api/certificates/${certificate.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold text-[#9c9c94] hover:text-brand-mint underline"
+                          >
+                            Descargar PDF
+                          </a>
+                        </div>
                       ) : progress.percent === 100 && alumno ? (
                         <form action={issueCertificate.bind(null, enrollment.workshop_id, alumno.id)}>
                           <SubmitButton

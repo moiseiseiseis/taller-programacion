@@ -30,6 +30,12 @@ export default async function StudentProgressPage() {
 
   const validWorkshops = workshopsProgress.filter((w): w is NonNullable<typeof w> => w !== null);
 
+  const { data: certificates } = await supabase
+    .from('certificates')
+    .select('id, workshop_id')
+    .eq('user_id', user?.id);
+  const certByWorkshop = new Map((certificates ?? []).map((c) => [c.workshop_id as string, c.id as string]));
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
@@ -49,27 +55,45 @@ export default async function StudentProgressPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {validWorkshops.map(({ workshop, progress }) => (
-            <Link
-              key={workshop.id}
-              href={`/dashboard/student/taller/${workshop.id}`}
-              className="block bg-brand-terminal-panel rounded-2xl border border-brand-terminal-border p-6 hover:border-brand-mint/40 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-bold text-brand-beige">{workshop.title}</h2>
-                <span className="text-sm font-bold text-[#9c9c94]">{progress.percent}%</span>
+          {validWorkshops.map(({ workshop, progress }) => {
+            const certificateId = certByWorkshop.get(workshop.id);
+            return (
+              <div
+                key={workshop.id}
+                className="bg-brand-terminal-panel rounded-2xl border border-brand-terminal-border p-6 hover:border-brand-mint/40 transition-colors"
+              >
+                <Link href={`/dashboard/student/taller/${workshop.id}`} className="block">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-bold text-brand-beige">{workshop.title}</h2>
+                    <span className="text-sm font-bold text-[#9c9c94]">{progress.percent}%</span>
+                  </div>
+                  <div className="h-2 bg-black/30 rounded-full overflow-hidden mb-2">
+                    <div
+                      className="h-full bg-brand-mint transition-all duration-300"
+                      style={{ width: `${progress.percent}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-[#9c9c94]">
+                    {progress.completedLessons} de {progress.totalLessons} lecciones completadas
+                  </p>
+                </Link>
+
+                {certificateId && (
+                  <div className="mt-4 pt-4 border-t border-brand-terminal-border flex items-center justify-between">
+                    <span className="text-xs font-bold text-brand-mint">Certificado disponible</span>
+                    <a
+                      href={`/api/certificates/${certificateId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-brand-mint hover:underline"
+                    >
+                      Descargar PDF →
+                    </a>
+                  </div>
+                )}
               </div>
-              <div className="h-2 bg-black/30 rounded-full overflow-hidden mb-2">
-                <div
-                  className="h-full bg-brand-mint transition-all duration-300"
-                  style={{ width: `${progress.percent}%` }}
-                />
-              </div>
-              <p className="text-xs text-[#9c9c94]">
-                {progress.completedLessons} de {progress.totalLessons} lecciones completadas
-              </p>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
