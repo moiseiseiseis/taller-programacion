@@ -18,7 +18,7 @@ export async function getStudySessionState(
   createdAt: string | null | undefined,
   workshopId: string
 ): Promise<StudySessionState> {
-  if (!userId || !isPilotWindowOpen() || !isPilotStudent(createdAt)) {
+  if (!userId || !isPilotWindowOpen() || !isPilotStudent(createdAt, userId)) {
     return { showButton: false, initialSession: null };
   }
 
