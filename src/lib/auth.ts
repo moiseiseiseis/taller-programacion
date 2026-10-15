@@ -14,12 +14,12 @@ export const getAuthUser = cache(async () => {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return { user: null, role: null as Role | null, name: null as string | null }
+    return { user: null, role: null as Role | null, name: null as string | null, createdAt: null as string | null }
   }
 
   const { data: profile } = await supabase
     .from('users')
-    .select('role, name')
+    .select('role, name, created_at')
     .eq('id', user.id)
     .single()
 
@@ -27,6 +27,7 @@ export const getAuthUser = cache(async () => {
     user,
     role: (profile?.role || 'student') as Role,
     name: profile?.name ?? null,
+    createdAt: profile?.created_at ?? null,
   }
 })
 

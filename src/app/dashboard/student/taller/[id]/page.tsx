@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation';
 import { Check, Lock, BookOpen, Code2, Trophy } from 'lucide-react';
 import { getOrderedLessons, getLockedLessonIds, calculateProgress } from '@/lib/lessonSequence';
 import { urlKind } from '@/lib/media';
+import { getStudySessionState } from '@/lib/studySessions/getStudySessionState';
+import StudySessionButton from '@/components/student/StudySessionButton';
 
 const categoryStyles: Record<string, { label: string, color: string }> = {
   hardware: { label: 'Hardware', color: 'bg-purple-500/10 text-purple-300 border-purple-500/30' },
@@ -15,7 +17,8 @@ const categoryStyles: Record<string, { label: string, color: string }> = {
 export default async function StudentWorkshopPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { user } = await getAuthUser();
+  const { user, createdAt } = await getAuthUser();
+  const studySession = await getStudySessionState(supabase, user?.id, createdAt, id);
 
   // 1. Traemos el taller con todos sus módulos y lecciones ordenadas
   const { data: workshop, error: workshopError } = await supabase
@@ -227,6 +230,10 @@ export default async function StudentWorkshopPage({ params }: { params: Promise<
             ))}
           </div>
         </div>
+      )}
+
+      {studySession.showButton && (
+        <StudySessionButton workshopId={id} initialSession={studySession.initialSession} />
       )}
     </div>
   );

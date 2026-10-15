@@ -16,6 +16,8 @@ import { getOrderedLessons, getNextLessonId, getFirstLockedLessonId } from '@/li
 import { getLessonQuizMaxScore, type LessonQuiz } from '@/lib/lessonQuiz';
 import type { LogicPuzzleData, LogicPuzzleSolution } from '@/lib/logicPuzzle/types';
 import { getYouTubeEmbedUrl } from '@/lib/media';
+import { getStudySessionState } from '@/lib/studySessions/getStudySessionState';
+import StudySessionButton from '@/components/student/StudySessionButton';
 
 // Diccionario visual para los colores de las categoríasIgual que el del instructor)
 const categoryStyles: Record<string, { label: string, color: string }> = {
@@ -27,7 +29,7 @@ const categoryStyles: Record<string, { label: string, color: string }> = {
 export default async function StudentLessonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { user } = await getAuthUser();
+  const { user, createdAt } = await getAuthUser();
 
   // 1. Buscamos la lección
   const { data: lesson } = await supabase
@@ -42,6 +44,9 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
   // desbloqueada (no hay quizzes anteriores sin aprobar) y cuál es la siguiente.
   const workshopId = lesson.modules?.workshop_id;
   const orderedLessons = workshopId ? await getOrderedLessons(supabase, workshopId) : [];
+  const studySession = workshopId
+    ? await getStudySessionState(supabase, user?.id, createdAt, workshopId)
+    : { showButton: false, initialSession: null };
 
   const { data: passedAttempts } = await supabase
     .from('lesson_quiz_attempts')
@@ -511,6 +516,10 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
             <PartyPopper size={16} /> ¡Completaste el taller!
           </span>
         </div>
+      )}
+
+      {studySession.showButton && workshopId && (
+        <StudySessionButton workshopId={workshopId} initialSession={studySession.initialSession} />
       )}
     </div>
   );
