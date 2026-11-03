@@ -4,14 +4,28 @@ import { Document, Page, View, Text, Image, Svg, Path, Font, StyleSheet } from '
 
 const FONTS_DIR = path.join(process.cwd(), 'src/lib/certificates/fonts');
 const LOGOS_DIR = path.join(process.cwd(), 'public/logos');
+const SIGNATURES_DIR = path.join(process.cwd(), 'public/signatures');
 
 function readLogo(name: string) {
   return fs.readFileSync(path.join(LOGOS_DIR, name));
 }
 
+// Firma en imagen de cada firmante, si ya existe el archivo (ver instrucciones
+// en el componente IssueCertificateForm / README de abajo). Mientras no
+// exista, el certificado se ve igual que antes — solo la línea en blanco.
+function readSignatureIfExists(fileName: string): Buffer | null {
+  const filePath = path.join(SIGNATURES_DIR, fileName);
+  return fs.existsSync(filePath) ? fs.readFileSync(filePath) : null;
+}
+
 const LOGO_UDG = readLogo('cert-udg.png');
 const LOGO_IEEE = readLogo('cert-ieee-cutlajo.png');
 const LOGO_CUTLAJO = readLogo('cert-cutlajo-banner.png');
+
+// Nombres de archivo esperados — colócalos en public/signatures/ (PNG, fondo
+// transparente idealmente) y aparecen solos en el próximo certificado.
+const SIGNATURE_VEGA_GOMEZ = readSignatureIfExists('vega-gomez.png');
+const SIGNATURE_MORA_VENTURA = readSignatureIfExists('mora-ventura.png');
 
 Font.register({
   family: 'Montserrat',
@@ -36,7 +50,7 @@ const GRAY_TEXT = '#4a4a4a';
 
 const PAGE_W = 792; // Carta horizontal (11in @ 72pt/in)
 const PAGE_H = 612;
-const BANNER_H = 100;
+const BANNER_H = 118;
 
 const styles = StyleSheet.create({
   page: {
@@ -138,9 +152,9 @@ export default function CertificateDocument({
       <Page size={{ width: PAGE_W, height: PAGE_H }} style={styles.page}>
         {/* Banner superior con los 3 logos */}
         <View style={styles.banner}>
-          <Image src={LOGO_UDG} style={{ width: 124, height: 46 }} />
-          <Image src={LOGO_IEEE} style={{ width: 110, height: 46 }} />
-          <Image src={LOGO_CUTLAJO} style={{ width: 130, height: 46 }} />
+          <Image src={LOGO_UDG} style={{ width: 183, height: 68 }} />
+          <Image src={LOGO_IEEE} style={{ width: 163, height: 68 }} />
+          <Image src={LOGO_CUTLAJO} style={{ width: 193, height: 68 }} />
         </View>
 
         {/* Ola celeste de transición entre el banner y el cuerpo blanco */}
@@ -152,7 +166,7 @@ export default function CertificateDocument({
         </Svg>
 
         {/* Cuerpo */}
-        <View style={{ position: 'absolute', top: 135, left: 40, width: PAGE_W - 80 }}>
+        <View style={{ position: 'absolute', top: 148, left: 40, width: PAGE_W - 80 }}>
           <Text style={[styles.centered, { fontSize: 15, fontWeight: 700, color: INK, letterSpacing: 2 }]}>
             OTORGA EL PRESENTE
           </Text>
@@ -185,13 +199,16 @@ export default function CertificateDocument({
           </Text>
 
           <Text style={[styles.centered, { fontSize: 13, color: GRAY_TEXT, marginTop: 12, lineHeight: 1.4 }]}>
-            Realizado el día {realizadoFecha}, en el {lugar}, con una duración de {duracionHoras} hrs
+            Realizado el día {realizadoFecha}, en {lugar}, con una duración de {duracionHoras} hrs
           </Text>
         </View>
 
         {/* Firmas */}
         <View style={{ position: 'absolute', bottom: 55, left: 0, width: PAGE_W, flexDirection: 'row', justifyContent: 'center' }}>
           <View style={{ width: 300, marginHorizontal: 20 }}>
+            {SIGNATURE_VEGA_GOMEZ && (
+              <Image src={SIGNATURE_VEGA_GOMEZ} style={{ width: 140, height: 42, alignSelf: 'center', marginBottom: -8 }} />
+            )}
             <View style={{ borderTopWidth: 1, borderTopColor: INK, paddingTop: 6 }}>
               <Text style={[styles.centered, { fontSize: 12, fontWeight: 700, color: INK }]}>{nombreFirmante}</Text>
               <Text style={[styles.centered, { fontSize: 10, color: GRAY_TEXT, marginTop: 2, lineHeight: 1.3 }]}>
@@ -200,6 +217,9 @@ export default function CertificateDocument({
             </View>
           </View>
           <View style={{ width: 300, marginHorizontal: 20 }}>
+            {SIGNATURE_MORA_VENTURA && (
+              <Image src={SIGNATURE_MORA_VENTURA} style={{ width: 140, height: 42, alignSelf: 'center', marginBottom: -8 }} />
+            )}
             <View style={{ borderTopWidth: 1, borderTopColor: INK, paddingTop: 6 }}>
               <Text style={[styles.centered, { fontSize: 12, fontWeight: 700, color: INK }]}>{nombreFirmante2}</Text>
               <Text style={[styles.centered, { fontSize: 10, color: GRAY_TEXT, marginTop: 2, lineHeight: 1.3 }]}>

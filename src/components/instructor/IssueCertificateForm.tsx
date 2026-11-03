@@ -7,10 +7,14 @@ export default function IssueCertificateForm({
   workshopId,
   studentId,
   action,
+  defaultRealizedAt,
+  defaultLocation,
 }: {
   workshopId: string;
   studentId: string;
   action: (workshopId: string, studentId: string, formData: FormData) => Promise<void>;
+  defaultRealizedAt?: string;
+  defaultLocation?: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -31,11 +35,14 @@ export default function IssueCertificateForm({
       className="flex flex-col gap-2 text-left bg-black/20 border border-brand-terminal-border rounded-lg p-3 w-64 ml-auto"
     >
       <div>
-        <label className="block text-[10px] font-bold text-[#9c9c94] mb-1">Fecha de realización</label>
+        <label className="block text-[10px] font-bold text-[#9c9c94] mb-1">
+          Fecha de realización {defaultRealizedAt && <span className="normal-case font-normal">(sugerida: cuándo terminó el taller)</span>}
+        </label>
         <input
           type="date"
           name="realized_at"
           required
+          defaultValue={defaultRealizedAt}
           className="w-full text-xs bg-black/30 border border-brand-terminal-border rounded px-2 py-1.5 text-brand-beige"
         />
       </div>
@@ -45,7 +52,8 @@ export default function IssueCertificateForm({
           type="text"
           name="location"
           required
-          placeholder="Laboratorio de Desarrollo Tecnológico"
+          defaultValue={defaultLocation}
+          placeholder="el laboratorio de Desarrollo Tecnológico"
           className="w-full text-xs bg-black/30 border border-brand-terminal-border rounded px-2 py-1.5 text-brand-beige placeholder:text-[#6f6f68]"
         />
       </div>

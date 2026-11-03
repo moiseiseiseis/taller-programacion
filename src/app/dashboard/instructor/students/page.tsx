@@ -38,15 +38,18 @@ export default async function AlumnosInscritosPage() {
   );
 
   // Completions de todos los alumnos inscritos, en una sola consulta.
+  // Guardamos también created_at: es de dónde sacamos "cuándo terminó
+  // realmente el taller", para sugerir la fecha de realización del
+  // certificado sin que el instructor tenga que recordarla/escribirla.
   const studentIds = Array.from(new Set(rows.map((r) => r.users?.id).filter((id): id is string => !!id)));
   const { data: allCompletions } = studentIds.length
-    ? await supabase.from('lesson_completions').select('user_id, lesson_id').in('user_id', studentIds)
-    : { data: [] as { user_id: string; lesson_id: string }[] };
+    ? await supabase.from('lesson_completions').select('user_id, lesson_id, created_at').in('user_id', studentIds)
+    : { data: [] as { user_id: string; lesson_id: string; created_at: string }[] };
 
-  const completedByStudent = new Map<string, Set<string>>();
+  const completedByStudent = new Map<string, Map<string, string>>();
   for (const c of allCompletions ?? []) {
-    if (!completedByStudent.has(c.user_id)) completedByStudent.set(c.user_id, new Set());
-    completedByStudent.get(c.user_id)!.add(c.lesson_id);
+    if (!completedByStudent.has(c.user_id)) completedByStudent.set(c.user_id, new Map());
+    completedByStudent.get(c.user_id)!.set(c.lesson_id, c.created_at);
   }
 
   // Certificados ya emitidos (RLS ya los limita a los talleres de este instructor).
@@ -61,10 +64,20 @@ export default async function AlumnosInscritosPage() {
     const alumno = enrollment.users;
     const taller = enrollment.workshops;
     const ordered = orderedByWorkshop.get(enrollment.workshop_id) ?? [];
-    const completed = (alumno && completedByStudent.get(alumno.id)) || new Set<string>();
-    const progress = calculateProgress(ordered, completed);
+    const completedDates = (alumno && completedByStudent.get(alumno.id)) || new Map<string, string>();
+    const progress = calculateProgress(ordered, new Set(completedDates.keys()));
     const certificate = alumno ? certByKey.get(`${alumno.id}:${enrollment.workshop_id}`) : undefined;
-    return { enrollment, alumno, taller, progress, certificate };
+
+    // Última lección completada de ESTE taller = cuándo realmente lo terminó.
+    const completionTimestamps = ordered
+      .map((lesson) => completedDates.get(lesson.id))
+      .filter((d): d is string => !!d);
+    const lastCompletedAt = completionTimestamps.length
+      ? completionTimestamps.reduce((max, d) => (d > max ? d : max))
+      : null;
+    const defaultRealizedAt = lastCompletedAt ? lastCompletedAt.slice(0, 10) : '';
+
+    return { enrollment, alumno, taller, progress, certificate, defaultRealizedAt };
   });
 
   return (
@@ -88,7 +101,7 @@ export default async function AlumnosInscritosPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-terminal-border">
-                {withProgress.map(({ enrollment, alumno, taller, progress, certificate }, idx) => (
+                {withProgress.map(({ enrollment, alumno, taller, progress, certificate, defaultRealizedAt }, idx) => (
                   <tr key={idx} className="hover:bg-black/20 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-brand-beige">{alumno?.name || 'Sin nombre'}</div>
@@ -127,6 +140,8 @@ export default async function AlumnosInscritosPage() {
                           workshopId={enrollment.workshop_id}
                           studentId={alumno.id}
                           action={issueCertificate}
+                          defaultRealizedAt={defaultRealizedAt}
+                          defaultLocation="la Plataforma autogestiva Programación para Futuros Programadores"
                         />
                       ) : (
                         <span className="text-xs text-[#6f6f68]">Taller en curso</span>
