@@ -1,228 +1,213 @@
 import fs from 'fs';
 import path from 'path';
-import { Document, Page, View, Text, Image, Font, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, View, Text, Image, Svg, Path, Font, StyleSheet } from '@react-pdf/renderer';
 
 const FONTS_DIR = path.join(process.cwd(), 'src/lib/certificates/fonts');
-const LOGO_PATH = path.join(process.cwd(), 'public/logos/logo_udg.png');
-// @react-pdf/renderer no resuelve de forma confiable una ruta de archivo local
-// como string (la trata como URL); leer el buffer directo evita eso.
-const LOGO_BUFFER = fs.readFileSync(LOGO_PATH);
+const LOGOS_DIR = path.join(process.cwd(), 'public/logos');
+
+function readLogo(name: string) {
+  return fs.readFileSync(path.join(LOGOS_DIR, name));
+}
+
+const LOGO_UDG = readLogo('cert-udg.png');
+const LOGO_IEEE = readLogo('cert-ieee-cutlajo.png');
+const LOGO_CUTLAJO = readLogo('cert-cutlajo-banner.png');
 
 Font.register({
   family: 'Montserrat',
-  fonts: [{ src: path.join(FONTS_DIR, 'Montserrat-Black.ttf'), fontWeight: 900 }],
-});
-Font.register({
-  family: 'Lora',
   fonts: [
-    { src: path.join(FONTS_DIR, 'Lora-Regular.ttf'), fontWeight: 400 },
-    { src: path.join(FONTS_DIR, 'Lora-Bold.ttf'), fontWeight: 700 },
+    { src: path.join(FONTS_DIR, 'Montserrat-Regular.ttf'), fontWeight: 400 },
+    { src: path.join(FONTS_DIR, 'Montserrat-Bold.ttf'), fontWeight: 700 },
   ],
 });
 Font.register({
-  family: 'JetBrains Mono',
-  fonts: [{ src: path.join(FONTS_DIR, 'JetBrainsMono-Regular.ttf'), fontWeight: 400 }],
+  family: 'Alex Brush',
+  fonts: [{ src: path.join(FONTS_DIR, 'AlexBrush-Regular.ttf'), fontWeight: 400 }],
 });
 
-// El diseño se aprobó en un lienzo de 1056x816 px (96 dpi, Carta horizontal).
-// El PDF usa puntos (72/in), así que todas las coordenadas del diseño se
-// escalan por 0.75 (72/96) para mantener exactamente las mismas proporciones.
-const SCALE = 0.75;
-const px = (n: number) => n * SCALE;
+// Certificado pensado para imprimirse: fondo blanco, nada de tema oscuro.
+// Replica la plantilla física del director (banner azul con los 3 logos,
+// ola celeste, "Reconocimiento" en script, y las dos firmas).
+const NAVY = '#084c93';
+const LIGHT_BLUE = '#b5e7fe';
+const ACCENT_BLUE = '#1d6fae';
+const INK = '#1a1a1a';
+const GRAY_TEXT = '#4a4a4a';
 
-const COLORS = {
-  bg: '#14100D',
-  panel: '#1A1613',
-  panelBorder: '#322C25',
-  mint: '#9BCCB1',
-  steel: '#9DB6D3',
-  red: '#D5615B',
-  lightBlue: '#C2D3E4',
-  cream: '#F5F1E7',
-  bodyGray: '#C8C8C0',
-  signatureLine: '#9C9C94',
-};
+const PAGE_W = 792; // Carta horizontal (11in @ 72pt/in)
+const PAGE_H = 612;
+const BANNER_H = 100;
 
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: COLORS.bg,
-    fontFamily: 'Lora',
+    backgroundColor: '#ffffff',
+    fontFamily: 'Montserrat',
   },
-  panel: {
+  banner: {
     position: 'absolute',
-    left: px(40),
-    top: px(40),
-    width: px(976),
-    height: px(736),
-    backgroundColor: COLORS.panel,
-    border: `${px(3)}pt solid ${COLORS.panelBorder}`,
-    borderRadius: px(36),
-  },
-  dot: {
-    position: 'absolute',
-    top: px(76),
-    width: px(20),
-    height: px(20),
-    borderRadius: px(10),
-  },
-  wordmark: {
-    position: 'absolute',
-    left: px(76),
-    top: px(104),
-    width: px(520),
-    fontSize: px(20),
-    color: COLORS.mint,
-    fontFamily: 'JetBrains Mono',
-  },
-  logoBox: {
-    position: 'absolute',
-    left: px(751),
-    top: px(37),
-    width: px(284),
-    height: px(256),
+    top: 0,
+    left: 0,
+    width: PAGE_W,
+    height: BANNER_H,
+    backgroundColor: NAVY,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 45,
   },
-  centeredRow: {
+  wave: {
     position: 'absolute',
-    left: px(128),
-    width: px(800),
+    top: BANNER_H - 14,
+    left: 0,
+    width: PAGE_W,
+    height: 26,
+  },
+  centered: {
     textAlign: 'center',
-  },
-  mintLine: {
-    position: 'absolute',
-    left: px(268),
-    top: px(350),
-    width: px(520),
-    height: px(2),
-    backgroundColor: COLORS.mint,
-  },
-  signatureLine: {
-    position: 'absolute',
-    left: px(378),
-    top: px(650),
-    width: px(300),
-    height: px(2),
-    backgroundColor: COLORS.signatureLine,
-  },
-  signatureText: {
-    position: 'absolute',
-    left: px(378),
-    top: px(660),
-    width: px(300),
-    fontSize: px(16),
-    color: COLORS.bodyGray,
-    textAlign: 'center',
-    lineHeight: 1.4,
-  },
-  footerLeft: {
-    position: 'absolute',
-    left: px(76),
-    top: px(738),
-    width: px(300),
-    fontSize: px(14),
-    color: COLORS.steel,
-    fontFamily: 'JetBrains Mono',
-  },
-  footerRight: {
-    position: 'absolute',
-    left: px(640),
-    top: px(738),
-    width: px(340),
-    fontSize: px(14),
-    color: COLORS.steel,
-    fontFamily: 'JetBrains Mono',
-    textAlign: 'right',
   },
 });
+
+function Laurel({ flip = false }: { flip?: boolean }) {
+  // Rama de laurel sencilla: un tallo curvo con hojas (óvalos) a los lados,
+  // igual a los que flanquean "Reconocimiento" en la plantilla física.
+  const leaves = [0, 1, 2, 3, 4].map((i) => {
+    const t = i / 4;
+    const x = 18 - t * 14;
+    const y = 4 + t * 46;
+    const rotation = flip ? 35 - t * 20 : -35 + t * 20;
+    return (
+      <View
+        key={i}
+        style={{
+          position: 'absolute',
+          left: flip ? 36 - x - 7 : x - 7,
+          top: y - 4,
+          width: 14,
+          height: 8,
+          borderRadius: 7,
+          backgroundColor: '#9a9a9a',
+          transform: `rotate(${rotation}deg)`,
+        }}
+      />
+    );
+  });
+
+  return (
+    <View style={{ width: 36, height: 56, position: 'relative' }}>
+      <Svg width={36} height={56} viewBox="0 0 36 56" style={{ position: 'absolute' }}>
+        <Path
+          d={flip ? 'M18 54 C 30 40, 30 16, 18 2' : 'M18 54 C 6 40, 6 16, 18 2'}
+          stroke="#9a9a9a"
+          strokeWidth={1.5}
+          fill="none"
+        />
+      </Svg>
+      {leaves}
+    </View>
+  );
+}
 
 export type CertificateData = {
   nombreAlumno: string;
   nombreTaller: string;
-  folio: string;
-  fechaEmision: string;
+  realizadoFecha: string;
+  lugar: string;
+  duracionHoras: string;
   nombreFirmante?: string;
   cargoFirmante?: string;
+  nombreFirmante2?: string;
+  cargoFirmante2?: string;
 };
 
 export default function CertificateDocument({
   nombreAlumno,
   nombreTaller,
-  folio,
-  fechaEmision,
-  nombreFirmante = 'Dr. Carlos Jesahel Vega López',
-  cargoFirmante = 'Director de Desarrollo Tecnológico e Ingenierías',
+  realizadoFecha,
+  lugar,
+  duracionHoras,
+  nombreFirmante = 'Dr. Carlos Jesahel Vega Gómez',
+  cargoFirmante = 'Director de la División de Desarrollo Tecnológico e Ingenierías',
+  nombreFirmante2 = 'Dr. Brhayllan Mora Ventura',
+  cargoFirmante2 = 'Jefe del Departamento de Innovación Tecnológica',
 }: CertificateData) {
-  const studentNameFontSize = nombreAlumno.length > 35 ? px(28) : nombreAlumno.length > 20 ? px(40) : px(56);
-
-  // El nombre del taller varía mucho entre talleres; se achica con la
-  // longitud para que, incluso el título más largo que existe hoy (47
-  // caracteres, "Fundamentos de Computación..."), quepa en una sola línea
-  // dentro de la caja de 600pt y no se encime con la leyenda de abajo.
-  const workshopTitleFontSize = nombreTaller.length > 45 ? px(22) : nombreTaller.length > 25 ? px(28) : px(34);
+  const studentNameFontSize = nombreAlumno.length > 35 ? 32 : nombreAlumno.length > 22 ? 40 : 48;
+  const workshopTitleFontSize = nombreTaller.length > 45 ? 15 : 17;
 
   return (
     <Document>
-      <Page size={{ width: px(1056), height: px(816) }} style={styles.page}>
-        <View style={styles.panel} />
-
-        <View style={[styles.dot, { left: px(76), backgroundColor: COLORS.red }]} />
-        <View style={[styles.dot, { left: px(104), backgroundColor: COLORS.lightBlue }]} />
-        <View style={[styles.dot, { left: px(132), backgroundColor: COLORS.mint }]} />
-
-        <Text style={styles.wordmark}>~/futuros-programadores_</Text>
-
-        <View style={styles.logoBox}>
-          <Image src={{ data: LOGO_BUFFER, format: 'png' }} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      <Page size={{ width: PAGE_W, height: PAGE_H }} style={styles.page}>
+        {/* Banner superior con los 3 logos */}
+        <View style={styles.banner}>
+          <Image src={LOGO_UDG} style={{ width: 124, height: 46 }} />
+          <Image src={LOGO_IEEE} style={{ width: 110, height: 46 }} />
+          <Image src={LOGO_CUTLAJO} style={{ width: 130, height: 46 }} />
         </View>
 
-        <Text style={[styles.centeredRow, { top: px(150), fontSize: px(18), color: COLORS.steel, fontFamily: 'JetBrains Mono' }]}>
-          $ cat certificado.log
-        </Text>
+        {/* Ola celeste de transición entre el banner y el cuerpo blanco */}
+        <Svg style={styles.wave} viewBox={`0 0 ${PAGE_W} 26`}>
+          <Path
+            d={`M0,8 C ${PAGE_W * 0.25},26 ${PAGE_W * 0.6},-6 ${PAGE_W},10 L${PAGE_W},26 L0,26 Z`}
+            fill={LIGHT_BLUE}
+          />
+        </Svg>
 
-        <Text style={[styles.centeredRow, { top: px(184), fontSize: px(24), fontWeight: 700, color: COLORS.mint }]}>
-          CERTIFICADO DE ACREDITACIÓN
-        </Text>
+        {/* Cuerpo */}
+        <View style={{ position: 'absolute', top: 135, left: 40, width: PAGE_W - 80 }}>
+          <Text style={[styles.centered, { fontSize: 15, fontWeight: 700, color: INK, letterSpacing: 2 }]}>
+            OTORGA EL PRESENTE
+          </Text>
 
-        <Text style={[styles.centeredRow, { top: px(232), fontSize: px(18), color: COLORS.steel, fontFamily: 'JetBrains Mono' }]}>
-          $ whoami
-        </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 6 }}>
+            <Laurel />
+            <Text style={{ fontFamily: 'Alex Brush', fontSize: 46, color: ACCENT_BLUE, marginHorizontal: 14 }}>
+              Reconocimiento
+            </Text>
+            <Laurel flip />
+          </View>
 
-        <Text
-          style={[
-            styles.centeredRow,
-            { top: px(256), fontSize: studentNameFontSize, fontWeight: 900, color: COLORS.cream, fontFamily: 'Montserrat' },
-          ]}
-        >
-          {nombreAlumno}
-        </Text>
+          <Text style={[styles.centered, { fontSize: 14, color: GRAY_TEXT, marginTop: 2 }]}>A:</Text>
 
-        <View style={styles.mintLine} />
+          <Text
+            style={[
+              styles.centered,
+              { fontFamily: 'Alex Brush', fontSize: studentNameFontSize, color: INK, marginTop: 8 },
+            ]}
+          >
+            {nombreAlumno}
+          </Text>
+          <View style={{ width: 360, height: 1, backgroundColor: NAVY, alignSelf: 'center', marginTop: 2, marginBottom: 14 }} />
 
-        <Text style={[styles.centeredRow, { top: px(366), fontSize: px(20), color: COLORS.bodyGray }]}>
-          por haber aprobado el taller
-        </Text>
+          <Text style={[styles.centered, { fontSize: 13, color: GRAY_TEXT }]}>
+            Por su participación y aprovechamiento en el
+          </Text>
+          <Text style={[styles.centered, { fontSize: workshopTitleFontSize, fontWeight: 700, color: INK, marginTop: 4 }]}>
+            {nombreTaller}
+          </Text>
 
-        <Text style={[styles.centeredRow, { top: px(396), fontSize: workshopTitleFontSize, fontWeight: 900, color: COLORS.cream, fontFamily: 'Montserrat' }]}>
-          {nombreTaller}
-        </Text>
-
-        <Text style={[styles.centeredRow, { top: px(452), fontSize: px(16), color: COLORS.bodyGray }]}>
-          Por haber demostrado los conocimientos, destrezas y responsabilidad requeridos para la acreditación de este programa de formación
-        </Text>
-
-        <Text style={[styles.centeredRow, { top: px(540), fontSize: px(18), color: COLORS.steel }]}>
-          División de Ingenierías
-        </Text>
-
-        <View style={styles.signatureLine} />
-        <View style={styles.signatureText}>
-          <Text>{nombreFirmante}</Text>
-          <Text>{cargoFirmante}</Text>
+          <Text style={[styles.centered, { fontSize: 13, color: GRAY_TEXT, marginTop: 12, lineHeight: 1.4 }]}>
+            Realizado el día {realizadoFecha}, en el {lugar}, con una duración de {duracionHoras} hrs
+          </Text>
         </View>
 
-        <Text style={styles.footerLeft}>Folio: {folio}</Text>
-        <Text style={styles.footerRight}>Fecha de emisión: {fechaEmision}</Text>
+        {/* Firmas */}
+        <View style={{ position: 'absolute', bottom: 55, left: 0, width: PAGE_W, flexDirection: 'row', justifyContent: 'center' }}>
+          <View style={{ width: 300, marginHorizontal: 20 }}>
+            <View style={{ borderTopWidth: 1, borderTopColor: INK, paddingTop: 6 }}>
+              <Text style={[styles.centered, { fontSize: 12, fontWeight: 700, color: INK }]}>{nombreFirmante}</Text>
+              <Text style={[styles.centered, { fontSize: 10, color: GRAY_TEXT, marginTop: 2, lineHeight: 1.3 }]}>
+                {cargoFirmante}
+              </Text>
+            </View>
+          </View>
+          <View style={{ width: 300, marginHorizontal: 20 }}>
+            <View style={{ borderTopWidth: 1, borderTopColor: INK, paddingTop: 6 }}>
+              <Text style={[styles.centered, { fontSize: 12, fontWeight: 700, color: INK }]}>{nombreFirmante2}</Text>
+              <Text style={[styles.centered, { fontSize: 10, color: GRAY_TEXT, marginTop: 2, lineHeight: 1.3 }]}>
+                {cargoFirmante2}
+              </Text>
+            </View>
+          </View>
+        </View>
       </Page>
     </Document>
   );

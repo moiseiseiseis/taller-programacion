@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getAuthUser } from '@/lib/auth';
 import { getOrderedLessons, calculateProgress, type SequencedLesson } from '@/lib/lessonSequence';
 import { issueCertificate } from '../actions';
-import SubmitButton from '@/components/ui/SubmitButton';
+import IssueCertificateForm from '@/components/instructor/IssueCertificateForm';
 
 type EnrollmentRow = {
   workshop_id: string;
@@ -123,14 +123,11 @@ export default async function AlumnosInscritosPage() {
                           </a>
                         </div>
                       ) : progress.percent === 100 && alumno ? (
-                        <form action={issueCertificate.bind(null, enrollment.workshop_id, alumno.id)}>
-                          <SubmitButton
-                            pendingText="Emitiendo"
-                            className="text-xs font-bold px-3 py-1.5 rounded-md bg-brand-mint/10 text-brand-mint hover:bg-brand-mint/20 border border-brand-mint/30"
-                          >
-                            Emitir certificado
-                          </SubmitButton>
-                        </form>
+                        <IssueCertificateForm
+                          workshopId={enrollment.workshop_id}
+                          studentId={alumno.id}
+                          action={issueCertificate}
+                        />
                       ) : (
                         <span className="text-xs text-[#6f6f68]">Taller en curso</span>
                       )}

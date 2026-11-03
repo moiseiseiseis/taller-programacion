@@ -699,9 +699,17 @@ export async function gradeReflectionSubmission(formData: FormData) {
 // lo cual ya incluye haber aprobado cualquier quiz del taller (pasar un
 // quiz marca la lección como completada). Reemitir (mismo alumno + taller)
 // actualiza la fecha y quién lo emitió, gracias al UNIQUE (user_id, workshop_id).
-export async function issueCertificate(workshopId: string, studentId: string) {
+export async function issueCertificate(workshopId: string, studentId: string, formData: FormData) {
   const instructorId = await requireRole('instructor');
   const supabase = await createClient();
+
+  const realizedAt = formData.get('realized_at') as string;
+  const location = formData.get('location') as string;
+  const durationHours = formData.get('duration_hours') as string;
+
+  if (!realizedAt || !location || !durationHours) {
+    throw new Error('Faltan datos del taller (fecha, lugar o duración)');
+  }
 
   const { data: workshop } = await supabase
     .from('workshops')
@@ -728,7 +736,15 @@ export async function issueCertificate(workshopId: string, studentId: string) {
   const { error } = await supabase
     .from('certificates')
     .upsert(
-      { user_id: studentId, workshop_id: workshopId, issued_by: instructorId, issued_at: new Date().toISOString() },
+      {
+        user_id: studentId,
+        workshop_id: workshopId,
+        issued_by: instructorId,
+        issued_at: new Date().toISOString(),
+        realized_at: realizedAt,
+        location,
+        duration_hours: Number(durationHours),
+      },
       { onConflict: 'user_id,workshop_id' }
     );
 

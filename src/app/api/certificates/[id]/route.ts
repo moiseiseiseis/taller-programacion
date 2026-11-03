@@ -23,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   // ambos casos, para no filtrar si el certificado existe.
   const { data: cert } = await supabase
     .from('certificates')
-    .select('id, issued_at, student:users!certificates_user_id_fkey(name), workshop:workshops(title)')
+    .select('id, realized_at, location, duration_hours, student:users!certificates_user_id_fkey(name), workshop:workshops(title)')
     .eq('id', id)
     .single();
 
@@ -35,18 +35,22 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const workshop = cert.workshop as unknown as { title: string } | null;
 
   const folio = `CERT-${cert.id.slice(0, 8).toUpperCase()}`;
-  const fechaEmision = new Date(cert.issued_at).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
+  const realizadoFecha = cert.realized_at
+    ? new Date(`${cert.realized_at}T12:00:00`).toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      })
+    : '';
+  const duracionHoras = cert.duration_hours != null ? String(cert.duration_hours) : '';
 
   const pdfBuffer = await renderToBuffer(
     CertificateDocument({
       nombreAlumno: student?.name || 'Alumno',
       nombreTaller: workshop?.title || 'Taller',
-      folio,
-      fechaEmision,
+      realizadoFecha,
+      lugar: cert.location || '',
+      duracionHoras,
     })
   );
 
